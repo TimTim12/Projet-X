@@ -2,3 +2,10 @@ Projet X
 Party B-Gin
 EPITA - Spé S4
 2015
+
+
+Pour compiler à la main avec OpenCV :
+gcc -c main.c -Wall `pkg-config opencv --cflags`
+gcc main.o -o main `pkg-config opencv --libs`
+
+
