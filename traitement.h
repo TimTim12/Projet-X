@@ -1,3 +1,6 @@
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #ifndef _TRAITEMENT_H
 #define _TRAITEMENT_H
 
