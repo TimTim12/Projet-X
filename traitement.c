@@ -4,9 +4,26 @@
 #include <stdbool.h>
 
 
+void set_color(IplImage *image, unsigned char* data){
+	int i, j;
+	//unsigned char* data = (unsigned char*)(image->imageData);
+	//set les pixels
+	for (i = 0; i < image->height; i++){
+		for (j = 0; j < image->width;j++){
+			if (data[2+3*j+3*image->width*i] > 200 && data[0+3*j+3*image->width*i] < 130 && data[1+3*j+3*image->width*i] < 130){
+				data[0+3*j+3*image->width*i] = 0; //bleu
+				data[1+3*j+3*image->width*i] = 0; //vert
+				data[2+3*j+3*image->width*i] = 255; //rouge
+			}
+		}
+	}
+}
+
+
 void filtre_carre(IplImage *img){
 	int i, j, h, w;
 	unsigned char* data = (unsigned char*)(img->imageData);
+	set_color(image, data);
 	for (i = 0; i < img->height; i++){   //set les pixels
 		for (j = 0; j < img->width;j++){
 			if (data[2+3*j+3*img->width*i] > 200 && data[0+3*j+3*img->width*i] < 100 && data[1+3*j+3*img->width*i] < 100){
