@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <opencv/highgui.h>
 #include <stdbool.h>
+#include "traitement.h"
 
 
 void set_color(IplImage *image, unsigned char* data){
@@ -23,7 +24,7 @@ void set_color(IplImage *image, unsigned char* data){
 void filtre_carre(IplImage *img){
 	int i, j, h, w;
 	unsigned char* data = (unsigned char*)(img->imageData);
-	set_color(image, data);
+	set_color(img, data);
 	for (i = 0; i < img->height; i++){   //set les pixels
 		for (j = 0; j < img->width;j++){
 			if (data[2+3*j+3*img->width*i] > 200 && data[0+3*j+3*img->width*i] < 100 && data[1+3*j+3*img->width*i] < 100){
@@ -125,7 +126,7 @@ void filtre_forme(IplImage *image){
 
 
 
-int main (int argc, char* argv[]){
+int traitement(){
 	char key;
 	IplImage *image;
 	CvCapture *capture = cvCreateCameraCapture( CV_CAP_ANY );  //capte image caméra
@@ -149,3 +150,4 @@ int main (int argc, char* argv[]){
 	}
 	return 0;
 }
+
