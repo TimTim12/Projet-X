@@ -4,7 +4,26 @@
 #include <stdbool.h>
 #include "traitement.h"
 
+int xr=0,yr=0,xb=0,yb=0,xv=0,yv=0;
 
+int get_xr() {
+    return xr;
+}
+int get_yr() {
+    return yr;
+}
+int get_xb() {
+    return xb;
+}
+int get_yb() {
+    return yb;
+}
+int get_xv() {
+    return xv;
+}
+int get_yv() {
+    return yv;
+}
 void set_color(char color, IplImage *image, unsigned char* data){
 	int i, j;
 	if (color != 'a') {
@@ -219,19 +238,26 @@ void filtre_forme(IplImage *image){
 			}
 		}
 	}
+        xb = yb = xv = yv = xr = yr = 0;
 	for (int i = -5; i < 6; i++) {
 	for (int j = -5; j < 6; j++) {
-		if (nb_b > 0) {  
+		if (nb_b > 0) {
+                xb = moy_xb/nb_b;
+                yb = moy_yb/nb_b;
 		data[0+3*(i+(moy_xb/nb_b))+3*image->width*(j+(moy_yb/nb_b))]= 240;
 		data[1+3*(i+(moy_xb/nb_b))+3*image->width*(j+(moy_yb/nb_b))]= 0;
 		data[2+3*(i+(moy_xb/nb_b))+3*image->width*(j+(moy_yb/nb_b))]= 240;
 	}
 	if (nb_v > 0) {  
+                xv = moy_xv/nb_v;
+                yv = moy_yv/nb_v;
 		data[0+3*(i+(moy_xv/nb_v))+3*image->width*(j+(moy_yv/nb_v))]= 240;
 		data[1+3*(i+(moy_xv/nb_v))+3*image->width*(j+(moy_yv/nb_v))]= 0;
 		data[2+3*(i+(moy_xv/nb_v))+3*image->width*(j+(moy_yv/nb_v))]= 240;
 	}
 	if (nb_r > 0) {  
+                xr = moy_xr/nb_r;
+                yr = moy_yr/nb_r;
 		data[0+3*(i+(moy_xr/nb_r))+3*image->width*(j+(moy_yr/nb_r))]= 240;
 		data[1+3*(i+(moy_xr/nb_r))+3*image->width*(j+(moy_yr/nb_r))]= 0;
 		data[2+3*(i+(moy_xr/nb_r))+3*image->width*(j+(moy_yr/nb_r))]= 240;
