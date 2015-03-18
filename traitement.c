@@ -25,7 +25,8 @@ int get_yv() {
     return yv;
 }
 
-void etalonage(char color, int value, int i, int j, IplImage *image, unsigned char* data){
+void etalonage(char color, int value, IplImage *image, unsigned char* data){
+	int i, j;
 	int r=0,v=0,b=0;
 	int pix1, pix2, pix3;
 	if(color == 'r') {
@@ -44,48 +45,22 @@ void etalonage(char color, int value, int i, int j, IplImage *image, unsigned ch
 		pix2 = 1;
 		pix3 = 2;
 	}
-
-	if (data[pix1+3*j+3*image->width*i] > value && data[pix2+3*j+3*image->width*i] < 130 && data[pix3+3*j+3*image->width*i] < 130){
-		data[0+3*j+3*image->width*i] = b; //bleu
-		data[1+3*j+3*image->width*i] = v; //vert
-		data[2+3*j+3*image->width*i] = r; //rouge
+	for (i = 0; i < image->height; i++){
+		for (j = 0; j < image->width;j++){
+			if (data[pix1+3*j+3*image->width*i] > value && data[pix2+3*j+3*image->width*i] < 130 && data[pix3+3*j+3*image->width*i] < 130){
+				data[0+3*j+3*image->width*i] = b; //bleu
+				data[1+3*j+3*image->width*i] = v; //vert
+				data[2+3*j+3*image->width*i] = r; //rouge
+			}
+		}
 	}
-
 }
 
 
 void set_color(char color, IplImage *image, unsigned char* data){
 	int i, j;
 	if (color != 'a') {
-		int r=0,v=0,b=0;
-		int pix1, pix2, pix3;
-		if(color == 'r') {
-			r=255;
-			pix1 = 2;
-			pix2 = 0;
-			pix3 = 1;
-		}else if (color == 'v'){
-			v=255;
-			pix1 = 1;
-			pix2 = 0;
-			pix3 = 2;
-		}else { 
-			b=255;
-			pix1 = 0;
-			pix2 = 1;
-			pix3 = 2;
-		}
-		//unsigned char* data = (unsigned char*)(image->imageData);
-		//set les pixels
-		for (i = 0; i < image->height; i++){
-			for (j = 0; j < image->width;j++){
-				if (data[pix1+3*j+3*image->width*i] > 255 && data[pix2+3*j+3*image->width*i] < 130 && data[pix3+3*j+3*image->width*i] < 130){
-					data[0+3*j+3*image->width*i] = b; //bleu
-					data[1+3*j+3*image->width*i] = v; //vert
-					data[2+3*j+3*image->width*i] = r; //rouge
-				}
-			}
-		}
+		etalonage(color, 100, image, data);
 	}else {
 		for (i = 0; i < image->height; i++){
 			for (j = 0; j < image->width;j++){
