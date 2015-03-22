@@ -9,3 +9,4 @@ gcc -c main.c -Wall `pkg-config opencv --cflags`
 gcc main.o -o main `pkg-config opencv --libs` -lm
 
 Sinon ya le Makefile qui compile bien, par contre faut faire make clean avant de recompiler, sinon ça marche pas, je crois qui change pas le .o, je suis pas sur, faut voir.
+prout.
