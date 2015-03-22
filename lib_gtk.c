@@ -12,6 +12,7 @@ GtkWidget* blue = NULL;
 GtkWidget* red_c = NULL;
 GtkWidget* green_c = NULL;
 GtkWidget* blue_c = NULL;
+int xa = 50;
 
 GtkWidget* convertOpenCv2Gtk (IplImage* srcImage)
 {
@@ -41,18 +42,47 @@ GtkWidget* convertOpenCv2Gtk (IplImage* srcImage)
     gtkImg = gtk_image_new_from_pixbuf ( gtkPixbuf );
     return gtkImg;
 }
+GdkPixbuf* convertOpenCv2Gtkp (IplImage* srcImage)
+{
+    GtkWidget* gtkImg = NULL;
+    GdkPixbuf* gtkPixbuf = NULL;
+    IplImage* dstImage = NULL;
+
+    /** Creating the destionation image */
+    dstImage = cvCreateImage( cvSize(srcImage->width,srcImage->height), IPL_DEPTH_8U, 3);
+
+    /** Converting the format of the picture from BGR to RGB */
+    cvCvtColor ( srcImage, dstImage, CV_BGR2RGB );
+
+    /** Creates a new GdkPixbuf out of in-memory image data */
+    gtkPixbuf = gdk_pixbuf_new_from_data ( (guchar*)dstImage->imageData,
+            GDK_COLORSPACE_RGB,
+            FALSE,
+            dstImage->depth,
+            dstImage->width,
+            dstImage->height,
+            (dstImage->widthStep),
+            NULL,
+            NULL
+            );
+
+    /** Create new GtkImage displaying pixbuf */
+  //  gtkImg = gtk_image_new_from_pixbuf ( gtkPixbuf );
+    return gtkPixbuf;
+}
 gboolean callback(gpointer data) //Requette Webcam + traitement de l'image
 {
+   // xa = xa * -1; 
       IplImage *image_cam= cvQueryFrame(capture);
       filtre_forme(image_cam);
       image = convertOpenCv2Gtk(image_cam);
-        gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
-        gtk_widget_queue_draw(layout);
+      gtk_layout_put(GTK_LAYOUT(data), image, 0, 0);
+      gtk_widget_queue_draw(GTK_WIDGET(data));
    //   gtk_widget_show_all(MainWindow);
-    //  g_usleep(1000);
+   //   g_usleep(150);
    
-    gtk_widget_show_all(layout);
-      return TRUE;
+    gtk_widget_show_all(GTK_WIDGET(data));
+    return TRUE;
 
 }
 gboolean red_up( gpointer label)
@@ -115,12 +145,12 @@ int init_gtk(int argc, char **argv){
     gtk_layout_put(GTK_LAYOUT(layout), green_c, 260,600);
     gtk_layout_put(GTK_LAYOUT(layout), blue_c, 460,600);
 
-   gint func_ref = g_timeout_add_full(G_PRIORITY_HIGH,130,callback,layout ,NULL);//loop traitement image + affichage (callback)
+    int func_ref = g_timeout_add_full(G_PRIORITY_HIGH,130,callback,layout ,NULL);//loop traitement image + affichage (callback)
     g_signal_connect_swapped(G_OBJECT(MainWindow), "destroy",
     G_CALLBACK(gtk_main_quit), NULL);//bouton quitter propre
-    g_timeout_add_full(G_PRIORITY_HIGH,200,red_up,red_c,NULL);
-    g_timeout_add_full(G_PRIORITY_HIGH,200,green_up,green_c,NULL);
-    g_timeout_add_full(G_PRIORITY_HIGH,200,blue_up,blue_c ,NULL);
+    g_timeout_add_full(G_PRIORITY_HIGH,100,red_up,red_c,NULL);
+    g_timeout_add_full(G_PRIORITY_HIGH,100,green_up,green_c,NULL);
+    g_timeout_add_full(G_PRIORITY_HIGH,100,blue_up,blue_c ,NULL);
   //  g_timeout_add_full(G_PRIORITY_HIGH,100,green_up,green ,NULL);
   //  g_timeout_add_full(G_PRIORITY_HIGH,100,blue_up,blue ,NULL);
 
