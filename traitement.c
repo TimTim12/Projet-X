@@ -24,38 +24,43 @@ int get_xv() {
 int get_yv() {
     return yv;
 }
+
+void etalonage(char color, int value, IplImage *image, unsigned char* data){
+	int i, j;
+	int r=0,v=0,b=0;
+	int pix1, pix2, pix3;
+	if(color == 'r') {
+		r=255;
+		pix1 = 2;
+		pix2 = 0;
+		pix3 = 1;
+	}else if (color == 'v'){
+		v=255;
+		pix1 = 1;
+		pix2 = 0;
+		pix3 = 2;
+	}else { 
+		b=255;
+		pix1 = 0;
+		pix2 = 1;
+		pix3 = 2;
+	}
+	for (i = 0; i < image->height; i++){
+		for (j = 0; j < image->width;j++){
+			if (data[pix1+3*j+3*image->width*i] > value && data[pix2+3*j+3*image->width*i] < 130 && data[pix3+3*j+3*image->width*i] < 130){
+				data[0+3*j+3*image->width*i] = b; //bleu
+				data[1+3*j+3*image->width*i] = v; //vert
+				data[2+3*j+3*image->width*i] = r; //rouge
+			}
+		}
+	}
+}
+
+
 void set_color(char color, IplImage *image, unsigned char* data){
 	int i, j;
 	if (color != 'a') {
-		int r=0,v=0,b=0;
-		int pix1, pix2, pix3;
-		if(color == 'r') {
-			r=255;
-			pix1 = 2;
-			pix2 = 0;
-			pix3 = 1;
-		}	else if (color == 'v'){
-			v=255;
-			pix1 = 1;
-			pix2 = 0;
-			pix3 = 2;
-		}	else { 
-			b=255;
-			pix1 = 0;
-			pix2 = 1;
-			pix3 = 2;
-		}
-		//unsigned char* data = (unsigned char*)(image->imageData);
-		//set les pixels
-		for (i = 0; i < image->height; i++){
-			for (j = 0; j < image->width;j++){
-				if (data[pix1+3*j+3*image->width*i] > 255 && data[pix2+3*j+3*image->width*i] < 130 && data[pix3+3*j+3*image->width*i] < 130){
-					data[0+3*j+3*image->width*i] = b; //bleu
-					data[1+3*j+3*image->width*i] = v; //vert
-					data[2+3*j+3*image->width*i] = r; //rouge
-				}
-			}
-		}
+		etalonage(color, 100, image, data);
 	}else {
 		for (i = 0; i < image->height; i++){
 			for (j = 0; j < image->width;j++){
@@ -238,31 +243,31 @@ void filtre_forme(IplImage *image){
 			}
 		}
 	}
-        xb = yb = xv = yv = xr = yr = 0;
+	xb = yb = xv = yv = xr = yr = 0;
 	for (int i = -5; i < 6; i++) {
-	for (int j = -5; j < 6; j++) {
-		if (nb_b > 0) {
-                xb = moy_xb/nb_b;
-                yb = moy_yb/nb_b;
-		data[0+3*(i+(moy_xb/nb_b))+3*image->width*(j+(moy_yb/nb_b))]= 240;
-		data[1+3*(i+(moy_xb/nb_b))+3*image->width*(j+(moy_yb/nb_b))]= 0;
-		data[2+3*(i+(moy_xb/nb_b))+3*image->width*(j+(moy_yb/nb_b))]= 240;
-	}
-	if (nb_v > 0) {  
-                xv = moy_xv/nb_v;
-                yv = moy_yv/nb_v;
-		data[0+3*(i+(moy_xv/nb_v))+3*image->width*(j+(moy_yv/nb_v))]= 240;
-		data[1+3*(i+(moy_xv/nb_v))+3*image->width*(j+(moy_yv/nb_v))]= 0;
-		data[2+3*(i+(moy_xv/nb_v))+3*image->width*(j+(moy_yv/nb_v))]= 240;
-	}
-	if (nb_r > 0) {  
-                xr = moy_xr/nb_r;
-                yr = moy_yr/nb_r;
-		data[0+3*(i+(moy_xr/nb_r))+3*image->width*(j+(moy_yr/nb_r))]= 240;
-		data[1+3*(i+(moy_xr/nb_r))+3*image->width*(j+(moy_yr/nb_r))]= 0;
-		data[2+3*(i+(moy_xr/nb_r))+3*image->width*(j+(moy_yr/nb_r))]= 240;
-	}
-	}
+		for (int j = -5; j < 6; j++) {
+			if (nb_b > 0) {
+				xb = moy_xb/nb_b;
+				yb = moy_yb/nb_b;
+				data[0+3*(i+(moy_xb/nb_b))+3*image->width*(j+(moy_yb/nb_b))]= 240;
+				data[1+3*(i+(moy_xb/nb_b))+3*image->width*(j+(moy_yb/nb_b))]= 0;
+				data[2+3*(i+(moy_xb/nb_b))+3*image->width*(j+(moy_yb/nb_b))]= 240;
+			}
+			if (nb_v > 0) {  
+				xv = moy_xv/nb_v;
+				yv = moy_yv/nb_v;
+				data[0+3*(i+(moy_xv/nb_v))+3*image->width*(j+(moy_yv/nb_v))]= 240;
+				data[1+3*(i+(moy_xv/nb_v))+3*image->width*(j+(moy_yv/nb_v))]= 0;
+				data[2+3*(i+(moy_xv/nb_v))+3*image->width*(j+(moy_yv/nb_v))]= 240;
+			}
+			if (nb_r > 0) {  
+				xr = moy_xr/nb_r;
+				yr = moy_yr/nb_r;
+				data[0+3*(i+(moy_xr/nb_r))+3*image->width*(j+(moy_yr/nb_r))]= 240;
+				data[1+3*(i+(moy_xr/nb_r))+3*image->width*(j+(moy_yr/nb_r))]= 0;
+				data[2+3*(i+(moy_xr/nb_r))+3*image->width*(j+(moy_yr/nb_r))]= 240;
+			}
+		}
 	}
 }
 
