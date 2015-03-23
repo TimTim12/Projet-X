@@ -4,7 +4,7 @@
 #include "struct.h"
 
 ColorRGB* new_color(int r,int g,int b) {
-	ColorRGB *pcolor = malloc(sizeof(struct s_ColorRGB)); 
+	ColorRGB *pcolor = (ColorRGB*)malloc(sizeof(struct s_ColorRGB)); 
 	pcolor->r = r;
 	pcolor->g = g;
 	pcolor->b = b;
@@ -12,7 +12,7 @@ ColorRGB* new_color(int r,int g,int b) {
 }
 
 Point* new_point(int x, int y, int r, int g, int b) {
-	Point *pPoint = malloc(sizeof(struct s_Point));
+	Point *pPoint = (Point*)malloc(sizeof(struct s_Point));
 	pPoint->x = x;
 	pPoint->y = y;
 	pPoint->color = new_color(r,g,b);
