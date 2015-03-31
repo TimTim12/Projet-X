@@ -12,7 +12,7 @@ GtkWidget* blue = NULL;
 GtkWidget* red_c = NULL;
 GtkWidget* green_c = NULL;
 GtkWidget* blue_c = NULL;
-int xa = 50;
+int xa = 20;
 
 GtkWidget* convertOpenCv2Gtk (IplImage* srcImage)
 {
@@ -67,30 +67,16 @@ GdkPixbuf* convertOpenCv2Gtkp (IplImage* srcImage)
             );
 
     /** Create new GtkImage displaying pixbuf */
-  //  gtkImg = gtk_image_new_from_pixbuf ( gtkPixbuf );
     return gtkPixbuf;
 }
-gboolean callback(gpointer data) //Requette Webcam + traitement de l'image
-{
-   // xa = xa * -1; 
-      IplImage *image_cam= cvQueryFrame(capture);
-      filtre_forme(image_cam);
-      image = convertOpenCv2Gtk(image_cam);
-      gtk_layout_put(GTK_LAYOUT(data), image, 0, 0);
-      gtk_widget_queue_draw(GTK_WIDGET(data));
-   //   gtk_widget_show_all(MainWindow);
-   //   g_usleep(150);
-   
-    gtk_widget_show_all(GTK_WIDGET(data));
-    return TRUE;
 
-}
 gboolean red_up( gpointer label)
 {
     int x = get_xr();
     int y = get_yr();
     char *new_coord = g_strdup_printf("%dx%d",x,y);
     gtk_label_set_text(GTK_LABEL(label), new_coord);
+    return TRUE;
 }
 gboolean green_up( gpointer label)
 {
@@ -98,6 +84,8 @@ gboolean green_up( gpointer label)
     int y = get_yv();
     char *new_coord = g_strdup_printf("%dx%d",x,y);
     gtk_label_set_text(GTK_LABEL(label),new_coord);
+    
+    return TRUE;
 }
 gboolean blue_up( gpointer label)
 {
@@ -105,60 +93,94 @@ gboolean blue_up( gpointer label)
     int y = get_yb();
     char *new_coord = g_strdup_printf("%dx%d",x,y);
     gtk_label_set_text(GTK_LABEL(label),new_coord);
+
+        
+    return TRUE;
+}
+static gboolean time_handler( GtkWidget *widget) {
+      return TRUE;
+}
+gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, GtkWidget *red) //Requette Webcam + traitement de l'image
+{ 
+      gtk_widget_queue_draw( GTK_WIDGET( widget ));
+      IplImage *image_cam= cvQueryFrame(capture);
+      filtre_forme(image_cam);
+     // image = convertOpenCv2Gtk(image_cam);
+
+
+    gdk_draw_pixbuf( widget->window,
+                    widget->style->fg_gc[ GTK_WIDGET_STATE( widget )],
+                    convertOpenCv2Gtkp(image_cam),
+                    0, 0, 0, 0,
+                    image_cam->width,
+                    image_cam->height,
+                    GDK_RGB_DITHER_MAX,
+                    0, 0);
+    
+    red_up(red);
+
+    return TRUE;
+
 }
 int init_gtk(int argc, char **argv){
     //***********Initialisation*************
     IplImage *image_cam;
     GtkWidget *button;
     gchar* TexteConverti = NULL;
-
+    GtkWidget *drawing_area;
     capture = cvCreateCameraCapture(CV_CAP_ANY);//Initialisation de la camera
     image_cam = cvQueryFrame(capture);//requette pour une image
 
     gtk_init(&argc, &argv);//Initialisation de GTK
     MainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(MainWindow), "Projet X");
-    gtk_window_set_default_size(GTK_WINDOW(MainWindow), 400, 400); 
+    gtk_window_set_default_size(GTK_WINDOW(MainWindow), 600, 600); 
     layout = gtk_layout_new(NULL, NULL);//emplacement de la caméra
     gtk_container_add(GTK_CONTAINER (MainWindow), layout);
     gtk_widget_show(layout); 
-    image = convertOpenCv2Gtk(image_cam);
-    gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
+    //image = convertOpenCv2Gtk(image_cam);
+    //gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
 
     //*****show coord
       //Convertion du texte avec les balises
     red =gtk_label_new("Rouge:");
     blue =gtk_label_new("Bleu:");
     green =gtk_label_new("Vert:");
-    red_c =gtk_label_new("");
-    blue_c =gtk_label_new("");
+    red_c =gtk_label_new("0x0");
+   /* blue_c =gtk_label_new("");
     green_c =gtk_label_new("");
 
-
-    gtk_label_set_use_markup(GTK_LABEL(red), TRUE);
+*/
+    gtk_label_set_use_markup(GTK_LABEL(red), TRUE);/*
     gtk_label_set_use_markup(GTK_LABEL(blue), TRUE);
-    gtk_label_set_use_markup(GTK_LABEL(green), TRUE);
+    gtk_label_set_use_markup(GTK_LABEL(green), TRUE);*/
     gtk_layout_put(GTK_LAYOUT(layout), red, 20,600);
-    gtk_layout_put(GTK_LAYOUT(layout), green, 220,600);
-    gtk_layout_put(GTK_LAYOUT(layout), blue, 420,600);
+  //  gtk_layout_put(GTK_LAYOUT(layout), green, 220,600);
+  //  gtk_layout_put(GTK_LAYOUT(layout), blue, 420,600);
     gtk_layout_put(GTK_LAYOUT(layout), red_c, 70,600);
-    gtk_layout_put(GTK_LAYOUT(layout), green_c, 260,600);
-    gtk_layout_put(GTK_LAYOUT(layout), blue_c, 460,600);
+  //  gtk_layout_put(GTK_LAYOUT(layout), green_c, 260,600);
+  //  gtk_layout_put(GTK_LAYOUT(layout), blue_c, 460,600);
 
-    int func_ref = g_timeout_add_full(G_PRIORITY_HIGH,130,callback,layout ,NULL);//loop traitement image + affichage (callback)
+
+  //  int func_ref = g_timeout_add_full(G_PRIORITY_HIGH,130,callback,image ,NULL);//loop traitement image + affichage (callback)
+    drawing_area = gtk_drawing_area_new();
+    gtk_widget_set_size_request( drawing_area,900,500);
+    gtk_container_add( GTK_CONTAINER( layout ), drawing_area );
     g_signal_connect_swapped(G_OBJECT(MainWindow), "destroy",
     G_CALLBACK(gtk_main_quit), NULL);//bouton quitter propre
-    g_timeout_add_full(G_PRIORITY_HIGH,100,red_up,red_c,NULL);
-    g_timeout_add_full(G_PRIORITY_HIGH,100,green_up,green_c,NULL);
-    g_timeout_add_full(G_PRIORITY_HIGH,100,blue_up,blue_c ,NULL);
+//    g_timeout_add_full(G_PRIORITY_HIGH,200,red_up,red_c,NULL);
+//  g_timeout_add_full(G_PRIORITY_HIGH,200,green_up,green_c,NULL);
+//  g_timeout_add_full(G_PRIORITY_HIGH,200,blue_up,blue_c ,NULL);
   //  g_timeout_add_full(G_PRIORITY_HIGH,100,green_up,green ,NULL);
   //  g_timeout_add_full(G_PRIORITY_HIGH,100,blue_up,blue ,NULL);
-
+    g_signal_connect( G_OBJECT( drawing_area), "expose_event", G_CALLBACK (expose_event_callback),red_c);
+    g_timeout_add( 130, ( GSourceFunc )time_handler, ( gpointer )drawing_area );
+ 
     //**********Start Programm *******
     gtk_widget_show_all(MainWindow);
     gtk_main();//begin infinite loop
 
-    g_source_remove (func_ref);//debrachement de la fonction dans la loop
+   // g_source_remove (func_ref);//debrachement de la fonction dans la loop
 
     return 0;
 
