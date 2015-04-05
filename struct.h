@@ -7,6 +7,8 @@
 typedef struct s_Point* Point;
 typedef struct s_ColorRGB ColorRGB;
 typedef struct s_Mvt* Mvt;
+typedef struct Element Element;
+typedef struct linked_List linked_List;
 
 struct s_Point {
 	int x;
@@ -24,6 +26,20 @@ struct s_Mvt {
 	clock_t t;
 	double v;
 	Point p;
+};
+
+struct Element
+{
+	Point *point;		// struct you must change if needed
+	Element *next ;
+	Element *prev;
+};
+
+struct linked_List
+{
+	int count;
+    Element *first;
+    Element *last;
 };
 
 

@@ -109,3 +109,130 @@ void print_vect(Mvt vect) {
 	}
 }
 
+// LINKED LISTS
+
+linked_List *emptyList()
+{
+	linked_List* list = (linked_List*)malloc(sizeof(linked_List));
+	if(list == NULL)
+	{
+		printf("Error allocating memory !");
+		exit(EXIT_FAILURE);
+	}
+	list->first = NULL;
+	list->last = NULL;
+	list->count = 0;
+	return list;
+}
+
+void addFirst(linked_List *list, Point *p)
+{
+	Element *elt = malloc(sizeof(Element));
+	if(list == NULL || elt == NULL)
+		exit(EXIT_FAILURE);
+	elt->point = p;
+	elt->next = list->first;
+	elt->prev = NULL;
+	if(!list->count) //if empty
+	{
+		list->first = elt;
+		list->last = elt;
+	}
+	else
+	{
+		elt->next->prev = elt;
+		list->first = elt;
+	}
+	list->count++;
+}
+
+void addLast(linked_List *list, Point *p)
+{
+	Element *elt = malloc(sizeof(Element));
+	if(list == NULL || elt == NULL)
+		exit(EXIT_FAILURE);
+	elt->point = p;
+	elt->prev = list->last;
+	elt->next = NULL;
+	if(!list->count)
+	{
+		list->first = elt;
+		list->last = elt;
+	}
+	else
+	{
+		elt->prev->next = elt;
+		list->last = elt;
+	}
+	list->count++;
+}
+
+Element* getIndex(linked_List *list, int index)
+{
+	if(!index)
+		return list->first;
+	if(index == list->count-1)
+		return list->last;
+	if(index >= list->count || index < 0)
+	{
+		printf("Wrong index.\n");
+		return NULL;
+	}
+	Element *tmp = list->first;
+	int i = 0;
+	while(i < index)
+	{
+		tmp = tmp->next;
+		i++;
+	}
+	return tmp;
+}
+
+
+void addIndex(linked_List *list, int index, Point *p)
+{
+	if(!index)
+	{
+		addFirst(list, p);
+		return;
+	}
+	if(index == list->count)
+	{
+		addLast(list, p);
+		return;
+	}
+	if(index >= list->count || index < 0)
+	{
+		printf("Wrong Index !\n");
+		return;
+	}
+	
+	Element *elt = getIndex(list, index-1);
+	
+	Element *tmp = malloc(sizeof(Element));
+	tmp->point = p;
+	tmp->prev = elt;
+	tmp->next = elt->next;	
+	tmp->next->prev = tmp;
+	elt->next = tmp;	
+	list->count++;
+}
+
+void printList(linked_List *list)
+{
+	if(!list->count)
+	{
+		printf("List is empty\n");
+		return;
+	}
+	printf("%d : {", list->count);
+	Element *tmp = list->first;
+	while(tmp != NULL && tmp != list->last)
+	{
+		printf("(%d,%d),",tmp->point->x, tmp->point->y);
+		tmp = tmp->next;
+	}
+	printf("(%d,%d)}\n", tmp->point->x, tmp->point->y);
+}
+
+
