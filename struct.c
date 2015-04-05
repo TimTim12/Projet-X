@@ -6,7 +6,8 @@
 #include "struct.h"
 
 #define VECT_LEN 100
-
+#define MIN_VIT 35000
+#define MAX_VIT 1000000
 void test() {
 	Point p = new_point(0,0,0,0,0);
 	int x = 0;
@@ -86,8 +87,12 @@ void set_Mvt(Mvt new, Mvt pred,Point pt) {
 	double dy2 = pow((double)(pred->p->y - pt->y),2);
 	double dx2 = pow((double)(pred->p->x - pt->x),2); 
 	double dist = sqrt(dx2+dy2);
-	printf("\033[33mdx2= %lf - dy2= %lf - dist= %f\n\033[0m",dx2,dy2,dist);
 	new->v = dist / ((double)(new->t - pred->t)/CLOCKS_PER_SEC);
+	if (v > MIN_VIT & v < MAX_VIT) {
+		printf("\033[33mdx2= %lf - dy2= %lf - dist= %f\n\033[0m",dx2,dy2,dist);
+	}else {
+		printf("\033[33mdx2= %lf - dy2= %lf - dist= %f\n\033[0m",dx2,dy2,dist);
+	}
 	*new->p = *pt;
 }
 
