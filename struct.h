@@ -30,7 +30,7 @@ struct s_Mvt {
 
 struct Element
 {
-	Point *point;		// struct you must change if needed
+	Point point;		// struct you must change if needed
 	Element *next ;
 	Element *prev;
 };

@@ -85,9 +85,9 @@ void set_Mvt(Mvt new, Mvt pred,Point pt) {
 	double dy2 = pow((double)(pred->p->y - pt->y),2);
 	double dx2 = pow((double)(pred->p->x - pt->x),2); 
 	double dist = sqrt(dx2+dy2);
-	printf("dx2= %lf - dy2= %lf - dist= %f\n",dx2,dy2,dist);
+	printf("\033[33mdx2= %lf - dy2= %lf - dist= %f\n\033[0m",dx2,dy2,dist);
 	new->v = dist / ((double)(new->t - pred->t)/CLOCKS_PER_SEC);
-	*new->p = *pt;	
+	*new->p = *pt;
 }
 
 void vect_update(Mvt vect, Point p) {
@@ -125,7 +125,7 @@ linked_List *emptyList()
 	return list;
 }
 
-void addFirst(linked_List *list, Point *p)
+void addFirst(linked_List *list, Point p)
 {
 	Element *elt = malloc(sizeof(Element));
 	if(list == NULL || elt == NULL)
@@ -146,7 +146,7 @@ void addFirst(linked_List *list, Point *p)
 	list->count++;
 }
 
-void addLast(linked_List *list, Point *p)
+void addLast(linked_List *list, Point p)
 {
 	Element *elt = malloc(sizeof(Element));
 	if(list == NULL || elt == NULL)
@@ -189,7 +189,7 @@ Element* getIndex(linked_List *list, int index)
 }
 
 
-void addIndex(linked_List *list, int index, Point *p)
+void addIndex(linked_List *list, int index, Point p)
 {
 	if(!index)
 	{
