@@ -6,7 +6,7 @@
 #include "struct.h"
 
 #define VECT_LEN 100
-#define MIN_VIT 35000
+#define MIN_VIT 350000
 #define MAX_VIT 1000000
 void test() {
 	Point p = new_point(0,0,0,0,0);
@@ -88,10 +88,7 @@ void set_Mvt(Mvt new, Mvt pred,Point pt) {
 	double dx2 = pow((double)(pred->p->x - pt->x),2); 
 	double dist = sqrt(dx2+dy2);
 	new->v = dist / ((double)(new->t - pred->t)/CLOCKS_PER_SEC);
-	if (v > MIN_VIT & v < MAX_VIT) {
-		printf("\033[33mdx2= %lf - dy2= %lf - dist= %f\n\033[0m",dx2,dy2,dist);
-	}else {
-		printf("\033[33mdx2= %lf - dy2= %lf - dist= %f\n\033[0m",dx2,dy2,dist);
+	printf("dx2= %lf - dy2= %lf - dist= %f\n",dx2,dy2,dist);
 	}
 	*new->p = *pt;
 }
@@ -103,8 +100,12 @@ void vect_update(Mvt vect, Point p) {
 	}
 
 void print_Mvt(Mvt mvt) {
-	printf("t = %f , v = %f || ", (double)mvt->t/CLOCKS_PER_SEC, mvt->v);
-	Point tmp = mvt->p;
+	if (new->v > MIN_VIT & new->v < MAX_VIT) 
+		printf("t = %f ,\033[33m v = %f\033[0m || ", (double)mvt->t/CLOCKS_PER_SEC, mvt->v);
+	}else {
+		printf("t = %f , v = %f || ", (double)mvt->t/CLOCKS_PER_SEC, mvt->v);
+	
+	}Point tmp = mvt->p;
 	printp(tmp);
 }
 
