@@ -18,7 +18,7 @@ void test() {
 		else if (i <70)
 			x = 3*i;
 		else if (i<90)
-			x = 2*i;
+		x = 2*i;
 		else
 			x=i;
 	set_point(p,x,100,0,0,0);
@@ -35,7 +35,7 @@ int main() {
 }
 
 ColorRGB* new_color(int r,int g,int b) {
-	ColorRGB *pcolor = malloc(sizeof(struct s_ColorRGB)); 
+	ColorRGB *pcolor = (ColorRGB*)malloc(sizeof(struct s_ColorRGB)); 
 	pcolor->r = r;
 	pcolor->g = g;
 	pcolor->b = b;
