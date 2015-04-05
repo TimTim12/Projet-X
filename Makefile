@@ -10,14 +10,14 @@ LDFLAGS+=`pkg-config --libs opencv gtk+-2.0`
 # ONLY FOR THIS EXERCICE
 all: projetX
 
-projetX: lib_gtk.o traitement_gtk.o projetX.o
-	$(CC) -o projetX lib_gtk.o traitement_gtk.o projetX.o $(LDFLAGS) -lm 
+projetX: lib_gtk.o traitement-gtk.o projetX.o
+	$(CC) -o projetX lib_gtk.o traitement-gtk.o projetX.o $(LDFLAGS) -lm 
 
 projetX.o: projetX.c
 	$(CC) $(CFLAGS) -c projetX.c 
 
-traitement_gtk.o: traitement_gtk.h traitement_gtk.c
-	$(CC) $(CFLAGS) -c traitement_gtk.c `pkg-config opencv --cflags` 
+traitement_gtk.o: traitement-gtk.h traitement-gtk.c
+	$(CC) $(CFLAGS) -c traitement-gtk.c `pkg-config opencv --cflags` 
 lib_gtk.o:
 	$(CC) -c lib_gtk.c $(CFLAGS) $<
 
