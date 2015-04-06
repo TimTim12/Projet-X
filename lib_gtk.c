@@ -179,7 +179,7 @@ int init_gtk(int argc, char **argv){
   //  gtk_layout_put(GTK_LAYOUT(layout), green_c, 260,600);
   //  gtk_layout_put(GTK_LAYOUT(layout), blue_c, 460,600);
 
-   GtkWidget *pLabel;
+/*   GtkWidget *pLabel;
    GtkWidget *pScrollbar;
    GtkObject *Adjust;
    GtkWidget *pColorBox;
@@ -192,18 +192,18 @@ int init_gtk(int argc, char **argv){
    pFrame = gtk_frame_new("Rouge");
    gtk_box_pack_start(GTK_BOX(pMainVBox), pFrame, FALSE, FALSE, 0);
    pColorBox = gtk_vbox_new(TRUE, 0);
-   gtk_container_add(GTK_CONTAINER(pFrame), pColorBox);
+   gtk_container_add(GTK_CONTAINER(pFrame), pColorBox);*/
 
    /* Label d'affichage de valeur R*/
-   pLabel = gtk_label_new("0");
-   gtk_box_pack_start(GTK_BOX(pColorBox), pLabel, FALSE, FALSE, 0);
+ //  pLabel = gtk_label_new("0");
+ //  gtk_box_pack_start(GTK_BOX(pColorBox), pLabel, FALSE, FALSE, 0);
    /* Création d un GtkAdjustment */
-   Adjust = gtk_adjustment_new(0, 0, 256, 1, 10, 1);
+ //  Adjust = gtk_adjustment_new(0, 0, 256, 1, 10, 1);
    /* Creation d une scrollbar horizontale*/
-   pScrollbar = gtk_hscrollbar_new(GTK_ADJUSTMENT(Adjust));
-   gtk_box_pack_start(GTK_BOX(pColorBox), pScrollbar, TRUE, TRUE, 0);
+ //  pScrollbar = gtk_hscrollbar_new(GTK_ADJUSTMENT(Adjust));
+ //  gtk_box_pack_start(GTK_BOX(pColorBox), pScrollbar, TRUE, TRUE, 0);
    /* Connexion du signal pour modification de l'affichage */
-   g_signal_connect(G_OBJECT(pScrollbar), "value-changed",
+   //g_signal_connect(G_OBJECT(pScrollbar), "value-changed",
       G_CALLBACK(OnScrollbarChange), (GtkWidget*)pLabel);
 
   //  int func_ref = g_timeout_add_full(G_PRIORITY_HIGH,130,callback,image ,NULL);//loop traitement image + affichage (callback)
