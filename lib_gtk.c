@@ -105,7 +105,8 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, GtkWidg
 { 
       gtk_widget_queue_draw( GTK_WIDGET( widget ));
       IplImage *image_cam= cvQueryFrame(capture);
-      filtre_forme(image_cam);
+	  for_gtk(image_cam);
+      //filtre_forme(image_cam);
      // image = convertOpenCv2Gtk(image_cam);
 
 
