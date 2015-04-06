@@ -47,6 +47,7 @@ struct linked_List
 //PROTOTYPES
 Point new_point(int x, int y, int r, int g, int b);
 void new_point1(Point p, int x, int y ,int r, int g, int b);
+void test();
 ColorRGB* new_color(int r, int g, int b);
 void set_color2(ColorRGB* c,int r, int g, int b);
 void set_point(Point p, int x, int y, int r, int g, int b);
