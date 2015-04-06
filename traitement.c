@@ -12,14 +12,14 @@
 #define sign(x) ((x) > 0 ? 1 : -1)
 
 
-#define STEP_MIN 5
+#define STEP_MIN 10
 #define STEP_MAX 100 
 
 // Position de l'objet, "couleur", seuil de tolérance
 CvPoint objectPos = cvPoint(-1, -1);
 int h = 0, s = 0, v = 0, tolerance = 10;
 
-IplImage *image;
+IplImage *image2;
 
 
 int xr=0,yr=0,xb=0,yb=0,xv=0,yv=0;
@@ -81,7 +81,7 @@ CvPoint binarisation(IplImage* image, int *nbPixels) {
 	}
 	
 	
-	cvShowImage("GeckoGeek Mask", mask);
+	cvShowImage("Mask", mask);
 
 	//free tout 
 	cvReleaseStructuringElement(&kernel);
@@ -89,7 +89,7 @@ CvPoint binarisation(IplImage* image, int *nbPixels) {
 	cvReleaseImage(&hsv);
 
 	//si pas d'objet dans la vidéo, point hors champ 
-	if(*nbPixels > 0)
+	if(*nbPixels > 20)
 		return cvPoint((int)(sommeX / (*nbPixels)), (int)(sommeY / (*nbPixels)));
 	else
 		return cvPoint(-1, -1);
@@ -132,19 +132,19 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels) {
 	if (nbPixels > 10)
 		cvDrawCircle(image, objectPos, 5, CV_RGB(255, 0, 0), -1);
 
-	cvShowImage("GeckoGeek Color Tracking", image);
+	cvShowImage("Color Tracking", image);
 }
 
 
-void getObjectColor(int event, int x, int y, int flags, void *param = NULL) {
+void getObjectColor(int event, int x, int y, int flags, void *param) {
 
 	CvScalar pixel;
 	IplImage *hsv;
 
 	if(event == CV_EVENT_LBUTTONUP) {
 
-		hsv = cvCloneImage(image);
-		cvCvtColor(image, hsv, CV_BGR2HSV);
+		hsv = cvCloneImage(image2);
+		cvCvtColor(image2, hsv, CV_BGR2HSV);
 		pixel = cvGet2D(hsv, y, x);
 
 		// Mets à jour la couleur rechercher
@@ -162,35 +162,54 @@ int traitement(){
 	char key;
 	IplImage *hsv;
 	int nbPixels;
-	CvPoint objectNextPos;
+	CvPoint objectNextPos1, objectNextPos2, objectNextPos3;
 	CvCapture *capture = cvCreateCameraCapture( CV_CAP_ANY );  //capte image caméra
 	if (!capture) {
 		printf("Ouverture du flux vidéo impossible !\n");
 	}else{ 
-		//fait la fenêtre
-		cvNamedWindow("GeckoGeek Color Tracking", CV_WINDOW_AUTOSIZE);
-		cvNamedWindow("GeckoGeek Mask", CV_WINDOW_AUTOSIZE);
-		cvMoveWindow("GeckoGeek Color Tracking", 0, 100);
-		cvMoveWindow("GeckoGeek Mask", 650, 100);
+		//fait les fenêtre
+		cvNamedWindow("Color Tracking", CV_WINDOW_AUTOSIZE);
+		cvNamedWindow("Mask", CV_WINDOW_AUTOSIZE);
+		cvMoveWindow("Color Tracking", 0, 100);
+		cvMoveWindow("Mask", 650, 100);
 
 		// clique souris
-		cvSetMouseCallback("GeckoGeek Color Tracking", getObjectColor);
+		cvSetMouseCallback("Color Tracking", getObjectColor);
 
 		while(key != 'q' && key != 'Q') {
-			image  = cvQueryFrame(capture);
-			objectNextPos = binarisation(image, &nbPixels);
-			addObjectToVideo(image, objectNextPos, nbPixels);
+			image2  = cvQueryFrame(capture);
+			if(1){
+				objectNextPos1 = binarisation(image2, &nbPixels);
+				addObjectToVideo(image2, objectNextPos1, nbPixels);
+			}else if(2){
+				objectNextPos2 = binarisation(image2, &nbPixels);
+				addObjectToVideo(image2, objectNextPos2, nbPixels);
+			}else{
+				objectNextPos3 = binarisation(image2, &nbPixels);
+				addObjectToVideo(image2, objectNextPos3, nbPixels);
+			}
+
+
+
 			//affiche et attend entré clavier pendant 10ms
 			key = cvWaitKey(10);
 		}
 
 		//free tout
 		cvDestroyAllWindows();
-		cvDestroyWindow("GeckoGeek Color Tracking");
-		cvDestroyWindow("GeckoGeek Mask");
+		cvDestroyWindow("Color Tracking");
+		cvDestroyWindow("Mask");
 		cvReleaseCapture(&capture);
 		printf("Merci d'avoir utilisé notre logiciel de capture d'image.\n");
 	}
 	return 0;
 }
 
+
+void for_gtk(IplImage *image){
+	int nbPixels;
+	CvPoint objectNextPos;
+	cvSetMouseCallback("Color Tracking", getObjectColor);
+	objectNextPos = binarisation(image, &nbPixels);
+	addObjectToVideo(image, objectNextPos, nbPixels);
+}
