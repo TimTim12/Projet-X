@@ -204,7 +204,7 @@ int init_gtk(int argc, char **argv){
  //  gtk_box_pack_start(GTK_BOX(pColorBox), pScrollbar, TRUE, TRUE, 0);
    /* Connexion du signal pour modification de l'affichage */
    //g_signal_connect(G_OBJECT(pScrollbar), "value-changed",
-      G_CALLBACK(OnScrollbarChange), (GtkWidget*)pLabel);
+//      G_CALLBACK(OnScrollbarChange), (GtkWidget*)pLabel);
 
   //  int func_ref = g_timeout_add_full(G_PRIORITY_HIGH,130,callback,image ,NULL);//loop traitement image + affichage (callback)
     drawing_area = gtk_drawing_area_new();
