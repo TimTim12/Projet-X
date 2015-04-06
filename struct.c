@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <opencv/cv.h>
+//#include <opencv/cv.h>
 #include "struct.h"
 
 #define VECT_LEN 100
@@ -31,11 +31,11 @@ void test() {
 	print_vect(vect);	
 }
 
-/*0
+
 int main() {
 	test();
 	return 0;
-}*/
+}
 
 
 ColorRGB* new_color(int r,int g,int b) {
