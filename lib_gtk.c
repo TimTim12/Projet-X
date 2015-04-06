@@ -1,5 +1,6 @@
 #include "lib_gtk.h"
 #include "traitement.h"
+#include "struct.h"
 #include <string.h>
 
 CvCapture *capture = NULL;
@@ -174,7 +175,7 @@ int init_gtk(int argc, char **argv){
 //  g_timeout_add_full(G_PRIORITY_HIGH,200,blue_up,blue_c ,NULL);
   //  g_timeout_add_full(G_PRIORITY_HIGH,100,green_up,green ,NULL);
   //  g_timeout_add_full(G_PRIORITY_HIGH,100,blue_up,blue ,NULL);
-    g_signal_connect( G_OBJECT( drawing_area), "expose_event", G_CALLBACK (expose_event_callback),red_c);
+    //g_signal_connect( G_OBJECT( drawing_area), "expose_event", G_CALLBACK (expose_event_callback),red_c);
     g_timeout_add( 130, ( GSourceFunc )time_handler, ( gpointer )drawing_area );
  
     //**********Start Programm *******

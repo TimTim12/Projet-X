@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <opencv/cv.h>
 #include "struct.h"
 
 #define VECT_LEN 100
@@ -28,11 +29,11 @@ void test() {
 	print_vect(vect);	
 }
 
-
+/*0
 int main() {
 	test();
 	return 0;
-}
+}*/
 
 ColorRGB* new_color(int r,int g,int b) {
 	ColorRGB *pcolor = (ColorRGB*)malloc(sizeof(struct s_ColorRGB)); 
@@ -42,7 +43,7 @@ ColorRGB* new_color(int r,int g,int b) {
 	return pcolor;
 }
 
-void set_color(ColorRGB* c,int r, int g, int b) {
+void set_color2(ColorRGB* c,int r, int g, int b) {
 	if (c) {
 		c->r = r;
 		c->g = g;
@@ -62,7 +63,7 @@ void set_point(Point p, int x, int y, int r, int g, int b) {
 	if (p) {
 	p->x = x;
 	p->y = y;
-	set_color(p->color,r,g,b);
+	set_color2(p->color,r,g,b);
 	}
 }	
 

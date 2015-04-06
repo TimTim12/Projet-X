@@ -3,6 +3,7 @@
 #include "cv.h"
 #include <iostream>
 #include <gtk/gtk.h>
+#include "struct.h"
 
 
 GtkWidget* convertOpenCv2Gtk (IplImage* srcImage);

@@ -6,6 +6,7 @@
 #include <gtk/gtk.h>
 #include "lib_gtk.h"
 #include<string.h>
+#include "struct.h"
 
 int main(int argc,char* argv[]) {
     if(strcmp(argv[1],"opencv"))   

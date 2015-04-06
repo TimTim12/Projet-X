@@ -45,13 +45,13 @@ struct linked_List
 
 //PROTOTYPES
 ColorRGB* new_color(int r, int g, int b);
-void set_color(ColorRGB* c,int r, int g, int b);
+void set_color2(ColorRGB* c,int r, int g, int b);
 Point new_point(int x, int y, int r, int g, int b);
 void set_point(Point p, int x, int y, int r, int g, int b);
 void printp(Point p);
 Mvt new_vect();
-void set_Mvt(Mvt new, Mvt pred, Point pt);
+void set_Mvt(Mvt new_vect, Mvt pred, Point pt);
 void vect_update(Mvt vect, Point p);
 void print_Mvt(Mvt mvt);
 void print_vect(Mvt vect);
-#endif
+#endif 
