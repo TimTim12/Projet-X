@@ -10,10 +10,13 @@ LDFLAGS+=`pkg-config --libs opencv gtk+-2.0`
 # ONLY FOR THIS EXERCICE
 all: projetX
 
-projetX: lib_gtk.o traitement.o projetX.o
-	$(CC) -o projetX lib_gtk.o traitement.o projetX.o $(LDFLAGS) -lm 
+projetX: lib_gtk.o struct.o traitement.o projetX.o 
+	$(CC) -o projetX lib_gtk.o struct.o traitement.o projetX.o  $(LDFLAGS) -lm 
 
-projetX.o: projetX.c
+struct.o: struct.h struct.c
+	gcc -std=c99 -c struct.c -o struct.o
+
+projetX.o: projetX.c 
 	$(CC) $(CFLAGS) -c projetX.c 
 
 traitement.o: traitement.h traitement.c
@@ -24,6 +27,8 @@ lib_gtk.o:
 clean::
 	rm -f *~ *.o
 	rm -f projetX
+
+re: clean all
 # END (do not delete)
 
 
