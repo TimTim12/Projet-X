@@ -1,4 +1,5 @@
 #include "lib_gtk.h"
+#include <gtk/gtk.h>
 #include "traitement.h"
 #include <string.h>
 
@@ -122,6 +123,21 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, GtkWidg
     return TRUE;
 
 }
+void OnScrollbarChange(GtkWidget *pWidget, gpointer data)
+{
+   gchar* sLabel;
+   gint iValue;
+
+   /* Récupération de la valeur de la scrollbar */
+   iValue = gtk_range_get_value(GTK_RANGE(pWidget));
+   /* Création du nouveau label */
+   sLabel = g_strdup_printf("%d", iValue);
+   /* Modification du label */
+   gtk_label_set_text(GTK_LABEL(data), sLabel);
+   /* Liberation memoire */
+   g_free(sLabel);
+}
+
 int init_gtk(int argc, char **argv){
     //***********Initialisation*************
     IplImage *image_cam;
@@ -161,6 +177,32 @@ int init_gtk(int argc, char **argv){
   //  gtk_layout_put(GTK_LAYOUT(layout), green_c, 260,600);
   //  gtk_layout_put(GTK_LAYOUT(layout), blue_c, 460,600);
 
+   GtkWidget *pLabel;
+   GtkWidget *pScrollbar;
+   GtkObject *Adjust;
+   GtkWidget *pColorBox;
+   GtkWidget *pFrame;
+   GtkWidget *pMainVBox;
+
+   pMainVBox = gtk_vbox_new(TRUE, 0);
+   gtk_layout_put(GTK_LAYOUT(layout), pMainVBox,500,500);
+
+   pFrame = gtk_frame_new("Rouge");
+   gtk_box_pack_start(GTK_BOX(pMainVBox), pFrame, FALSE, FALSE, 0);
+   pColorBox = gtk_vbox_new(TRUE, 0);
+   gtk_container_add(GTK_CONTAINER(pFrame), pColorBox);
+
+   /* Label d'affichage de valeur R*/
+   pLabel = gtk_label_new("0");
+   gtk_box_pack_start(GTK_BOX(pColorBox), pLabel, FALSE, FALSE, 0);
+   /* Création d un GtkAdjustment */
+   Adjust = gtk_adjustment_new(0, 0, 256, 1, 10, 1);
+   /* Creation d une scrollbar horizontale*/
+   pScrollbar = gtk_hscrollbar_new(GTK_ADJUSTMENT(Adjust));
+   gtk_box_pack_start(GTK_BOX(pColorBox), pScrollbar, TRUE, TRUE, 0);
+   /* Connexion du signal pour modification de l'affichage */
+   g_signal_connect(G_OBJECT(pScrollbar), "value-changed",
+      G_CALLBACK(OnScrollbarChange), (GtkWidget*)pLabel);
 
   //  int func_ref = g_timeout_add_full(G_PRIORITY_HIGH,130,callback,image ,NULL);//loop traitement image + affichage (callback)
     drawing_area = gtk_drawing_area_new();
