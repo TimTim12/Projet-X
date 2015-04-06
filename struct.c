@@ -31,13 +31,6 @@ void test() {
 	print_vect(vect);	
 }
 
-
-int main() {
-	test();
-	return 0;
-}
-
-
 ColorRGB* new_color(int r,int g,int b) {
 	ColorRGB *pcolor = (ColorRGB*)malloc(sizeof(struct s_ColorRGB)); 
 	pcolor->r = r;
