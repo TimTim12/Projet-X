@@ -6,8 +6,9 @@
 #include "struct.h"
 
 #define VECT_LEN 100
-#define MIN_VIT 350000
+#define MIN_VIT 300000
 #define MAX_VIT 1000000
+
 void test() {
 	Point p = new_point(0,0,0,0,0);
 	int x = 0;
@@ -35,6 +36,7 @@ int main() {
 	test();
 	return 0;
 }*/
+
 
 ColorRGB* new_color(int r,int g,int b) {
 	ColorRGB *pcolor = (ColorRGB*)malloc(sizeof(struct s_ColorRGB)); 
@@ -89,23 +91,48 @@ void set_Mvt(Mvt new, Mvt pred,Point pt) {
 	double dist = sqrt(dx2+dy2);
 	new->v = dist / ((double)(new->t - pred->t)/CLOCKS_PER_SEC);
 	printf("dx2= %lf - dy2= %lf - dist= %f\n",dx2,dy2,dist);
-	}
 	*new->p = *pt;
 }
 
 void vect_update(Mvt vect, Point p) {
 	static int i = 0;
+	static int start = 0;
+	static int len = 0;
+	static int end = 0;
 	set_Mvt(&vect[(i+1)%VECT_LEN],&vect[(i)], p);
 	i = (i+1)%VECT_LEN;
-	}
+	if (vect[i].v > MIN_VIT) {
+		if (!start)
+			start = i;
+		len++;
+		end=0;
+		
+	}else {
+		if (end > 4 && len <= 1) {
+			end=len=start=0;
+		}
+		end++;
+	} 
+	if (end > 4 || len == VECT_LEN-1) { 
+		// end > 4 : Valeur arbitraire (seuil d'érreur/incohérence)
+		//fin de mouvement
+		if (len > 2) {
+			printf("\033[33mMVT DETECTER : START=%d || END=%d\033[0m\n", start, start+len-1);
+		//Sauvegarde mouvement
+		//Fonction de traitement de mouvement, vect[start] to vect[(start+len-1)%V_L]
+		}
+		start = len = end = 0;
+	}	
+}
+
 
 void print_Mvt(Mvt mvt) {
-	if (new->v > MIN_VIT & new->v < MAX_VIT) 
-		printf("t = %f ,\033[33m v = %f\033[0m || ", (double)mvt->t/CLOCKS_PER_SEC, mvt->v);
+	if (mvt->v > MIN_VIT /*&&  mvt->v < MAX_VIT*/) {
+		printf("t = %f ,\033[32m v = %f\033[0m || ", (double)mvt->t/CLOCKS_PER_SEC, mvt->v);
 	}else {
 		printf("t = %f , v = %f || ", (double)mvt->t/CLOCKS_PER_SEC, mvt->v);
-	
-	}Point tmp = mvt->p;
+	}
+	Point tmp = mvt->p;
 	printp(tmp);
 }
 
