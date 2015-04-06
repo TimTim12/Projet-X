@@ -4,7 +4,7 @@
 #include <opencv/highgui.h>
 #include <iostream>
 #include "traitement.h"
-
+#include "struct.h"
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))  
@@ -79,7 +79,7 @@ CvPoint binarisation(IplImage* image, int *nbPixels) {
 			}
 		}
 	}
-	
+
 	
 	cvShowImage("Mask", mask);
 
@@ -103,7 +103,7 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels) {
 
 	int objectNextStepX, objectNextStepY;
 
-		if (nbPixels > 10) {
+	if (nbPixels > 10) {
 
 		// Reset position 
 		if (objectPos.x == -1 || objectPos.y == -1) {
@@ -131,7 +131,6 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels) {
 	//Dessine moi un mouton	
 	if (nbPixels > 10)
 		cvDrawCircle(image, objectPos, 5, CV_RGB(255, 0, 0), -1);
-
 	cvShowImage("Color Tracking", image);
 }
 
@@ -159,15 +158,18 @@ void getObjectColor(int event, int x, int y, int flags, void *param) {
 
 
 int traitement(){
+	//Point p;
+	//p = new_point(0,0,0,0,0);
 	char key;
 	IplImage *hsv;
 	int nbPixels;
-	CvPoint objectNextPos1, objectNextPos2, objectNextPos3;
+	CvPoint objectNextPos;
 	CvCapture *capture = cvCreateCameraCapture( CV_CAP_ANY );  //capte image caméra
 	if (!capture) {
 		printf("Ouverture du flux vidéo impossible !\n");
 	}else{ 
 		//fait les fenêtre
+
 		cvNamedWindow("Color Tracking", CV_WINDOW_AUTOSIZE);
 		cvNamedWindow("Mask", CV_WINDOW_AUTOSIZE);
 		cvMoveWindow("Color Tracking", 0, 100);
@@ -178,19 +180,8 @@ int traitement(){
 
 		while(key != 'q' && key != 'Q') {
 			image2  = cvQueryFrame(capture);
-			if(1){
-				objectNextPos1 = binarisation(image2, &nbPixels);
-				addObjectToVideo(image2, objectNextPos1, nbPixels);
-			}else if(2){
-				objectNextPos2 = binarisation(image2, &nbPixels);
-				addObjectToVideo(image2, objectNextPos2, nbPixels);
-			}else{
-				objectNextPos3 = binarisation(image2, &nbPixels);
-				addObjectToVideo(image2, objectNextPos3, nbPixels);
-			}
-
-
-
+			objectNextPos = binarisation(image2, &nbPixels);
+			addObjectToVideo(image2, objectNextPos, nbPixels);
 			//affiche et attend entré clavier pendant 10ms
 			key = cvWaitKey(10);
 		}
@@ -208,6 +199,8 @@ int traitement(){
 
 void for_gtk(IplImage *image){
 	int nbPixels;
+	//Point p;
+	//p = new_point(0,0,0,0,0);
 	CvPoint objectNextPos;
 	cvSetMouseCallback("Color Tracking", getObjectColor);
 	objectNextPos = binarisation(image, &nbPixels);
