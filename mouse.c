@@ -3,11 +3,10 @@
 #include<fcntl.h>
 #include<unistd.h>
 #include<string.h>
-
+#include "mouse.h"
+int count;
 int posY;
 int posX;
-
-void set_coord_mouse(int fd, int x, int y);
 
 int connect_mouse(char * file){
    int fd = open(file, O_RDWR);
@@ -42,6 +41,7 @@ void add_set_mouse(int fd, int x, int y){
 
 }
 void set_coord_mouse(int fd, int x, int y){
+    if(count >= 1){
     int newX,newY = 0;
     newX = x - posX;
     newY = y - posY;
@@ -70,7 +70,8 @@ void set_coord_mouse(int fd, int x, int y){
     if(x != -10000){ //avoid initialisation
     posX = x;
     posY = y;
-    }
+    count = 0;
+    }}else{count++;}
 }/*
 int main()
 {

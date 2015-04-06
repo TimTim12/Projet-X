@@ -4,7 +4,9 @@
 #include <opencv/highgui.h>
 #include <iostream>
 #include "traitement.h"
-#include "struct.h"
+#include <string.h>
+#include <math.h>
+#include "mouse.h"
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))  
@@ -18,7 +20,7 @@
 // Position de l'objet, "couleur", seuil de tolérance
 CvPoint objectPos = cvPoint(-1, -1);
 int h = 0, s = 0, v = 0, tolerance = 10;
-
+int fd;
 IplImage *image2;
 
 
@@ -98,9 +100,9 @@ CvPoint binarisation(IplImage* image, int *nbPixels) {
 
 
 
-
 void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels) {
-
+      //  Point p = NULL;
+      //  new_point1(p,0,0,0,0,0);
 	int objectNextStepX, objectNextStepY;
 
 	if (nbPixels > 10) {
@@ -135,11 +137,49 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels) {
 }
 
 
+void addObjectToVideo1(IplImage* image, CvPoint objectNextPos, int nbPixels, int fd) {
+      //  Point p = NULL;
+      //  new_point1(p,0,0,0,0,0);
+	int objectNextStepX, objectNextStepY;
+
+	if (nbPixels > 10) {
+
+		// Reset position 
+		if (objectPos.x == -1 || objectPos.y == -1) {
+			objectPos.x = objectNextPos.x;
+			objectPos.y = objectNextPos.y;
+		}
+
+		//lissage du déplacement 
+		if (abs(objectPos.x - objectNextPos.x) > STEP_MIN) {
+			objectNextStepX = max(STEP_MIN, min(STEP_MAX, abs(objectPos.x - objectNextPos.x) / 2));
+			objectPos.x += (-1) * sign(objectPos.x - objectNextPos.x) * objectNextStepX;
+		}
+		if (abs(objectPos.y - objectNextPos.y) > STEP_MIN) {
+			objectNextStepY = max(STEP_MIN, min(STEP_MAX, abs(objectPos.y - objectNextPos.y) / 2));
+			objectPos.y += (-1) * sign(objectPos.y - objectNextPos.y) * objectNextStepY;
+		}
+
+		// -1 = objet hors caméra
+	} else {
+
+		objectPos.x = -1;
+		objectPos.y = -1;
+	}   
+        set_coord_mouse(fd, -(objectPos.x* 1366)/620, (objectPos.y* 768)/480);
+        //set_coord_mouse(fd, -objectPos.x* 2, objectPos.y* 2);
+	//Dessine moi un mouton	
+	if (nbPixels > 10)
+		cvDrawCircle(image, objectPos, 5, CV_RGB(255, 0, 0), -1);
+	cvShowImage("Color Tracking", image);
+}
+
+
 void getObjectColor(int event, int x, int y, int flags, void *param) {
 
 	CvScalar pixel;
 	IplImage *hsv;
-
+        //fd = connect_mouse("/dev/input/event12");
 	if(event == CV_EVENT_LBUTTONUP) {
 
 		hsv = cvCloneImage(image2);
@@ -177,15 +217,18 @@ int traitement(){
 
 		// clique souris
 		cvSetMouseCallback("Color Tracking", getObjectColor);
-
-		while(key != 'q' && key != 'Q') {
+                //int fd = connect_mouse("/dev/input/event12");
+                while(key != 'q' && key != 'Q') {
 			image2  = cvQueryFrame(capture);
 			objectNextPos = binarisation(image2, &nbPixels);
-			addObjectToVideo(image2, objectNextPos, nbPixels);
+			if( key == 'r') 
+                        { fd = connect_mouse("/dev/input/event12"); }
+                        else
+                            addObjectToVideo1(image2, objectNextPos, nbPixels, fd);
 			//affiche et attend entré clavier pendant 10ms
 			key = cvWaitKey(10);
 		}
-
+                close(fd);
 		//free tout
 		cvDestroyAllWindows();
 		cvDestroyWindow("Color Tracking");

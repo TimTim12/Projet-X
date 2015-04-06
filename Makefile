@@ -11,14 +11,17 @@ LDFLAGS+=`pkg-config --libs opencv gtk+-2.0`
 # ONLY FOR THIS EXERCICE
 all: projetX
 
-projetX: lib_gtk.o struct.o traitement.o projetX.o 
-	$(CC) -o projetX lib_gtk.o struct.o traitement.o projetX.o  $(LDFLAGS) -lm 
+projetX: struct.o mouse.o lib_gtk.o traitement.o projetX.o 
+	$(CC) -o projetX struct.o mouse.o lib_gtk.o traitement.o projetX.o  $(LDFLAGS) -lm 
 
 struct.o: struct.h struct.c
 	gcc -std=c99 -c struct.c -o struct.o
 
 projetX.o: projetX.c 
 	$(CC) $(CFLAGS) -c projetX.c 
+
+mouse.o: mouse.h mouse.c
+	$(CC) $(CFLAGS) -c mouse.c
 
 traitement.o: traitement.h traitement.c
 	$(CC) $(CFLAGS) -c traitement.c `pkg-config opencv --cflags` 

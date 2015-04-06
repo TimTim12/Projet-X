@@ -31,12 +31,12 @@ void test() {
 	print_vect(vect);	
 }
 
-
+/*
 int main() {
 	test();
 	return 0;
 }
-
+*/
 
 ColorRGB* new_color(int r,int g,int b) {
 	ColorRGB *pcolor = (ColorRGB*)malloc(sizeof(struct s_ColorRGB)); 
@@ -60,6 +60,13 @@ Point new_point(int x, int y, int r, int g, int b) {
 	myPoint->y = y;
 	myPoint->color = new_color(r,g,b);
 	return myPoint;
+}
+void new_point1(Point p, int x, int y, int r, int g, int b) {
+        Point myPoint = malloc(sizeof(struct s_Point));
+        myPoint->x = x;
+        myPoint->y = y;
+        myPoint->color = new_color(r,g,b);
+        p = myPoint;
 }
 
 void set_point(Point p, int x, int y, int r, int g, int b) {
