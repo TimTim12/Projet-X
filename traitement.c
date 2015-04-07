@@ -224,7 +224,7 @@ int traitement(){
 			image2  = cvQueryFrame(capture);
 			objectNextPos = binarisation(image2, &nbPixels);
 			if( key == 'r') 
-                        { fd = connect_mouse("/dev/input/event12");a = 1;}
+                        { fd = connect_mouse("/dev/input/event14");a = 1;}
                         else
                             addObjectToVideo1(image2, objectNextPos, nbPixels, fd, a);
 			//affiche et attend entré clavier pendant 10ms
@@ -232,6 +232,8 @@ int traitement(){
 		}
                 close(fd);
 		//free tout
+		printf("\nimage de taille : %dx%d\n", image2->width, image2->height);
+
 		cvDestroyAllWindows();
 		cvDestroyWindow("Color Tracking");
 		cvDestroyWindow("Mask");
