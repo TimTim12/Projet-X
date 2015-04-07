@@ -386,6 +386,28 @@ linked_List* getCircle()
 {
 	linked_List* points = emptyList();
 	addLast(points, new_point(0,400,0,0,0));
+	addLast(points, new_point(150,375,0,0,0));
+	addLast(points, new_point(300,300,0,0,0));
+	addLast(points, new_point(375,150,0,0,0));
+	addLast(points, new_point(400,0,0,0,0));
+	addLast(points, new_point(375,-150,0,0,0));
+	addLast(points, new_point(300,-300,0,0,0));
+	addLast(points, new_point(150,-375,0,0,0));
+	addLast(points, new_point(0,-400,0,0,0));
+	addLast(points, new_point(-150,-375,0,0,0));
+	addLast(points, new_point(-300,-300,0,0,0));
+	addLast(points, new_point(-375,-150,0,0,0));
+	addLast(points, new_point(-400,0,0,0,0));
+	addLast(points, new_point(-375,150,0,0,0));
+	addLast(points, new_point(-300,300,0,0,0));
+	addLast(points, new_point(-150,375,0,0,0));
+	return points;
+}
+
+linked_List* getmCircle()
+{
+	linked_List* points = emptyList();
+	addLast(points, new_point(0,400,0,0,0));
 	addLast(points, new_point(133,370,0,0,0));
 	addLast(points, new_point(300,300,0,0,0));
 	addLast(points, new_point(350,250,0,0,0));
@@ -517,8 +539,15 @@ void step_by_step(Template** templates)
 	
 	getchar();
 	
+	printf("\033[1;1H\033[2J"); //clear console
+	
 	printf("Sending the previous Circle to the recognizer : \n");
 	printMatch(Circle, templates);
+	
+	getchar();
+	
+	printf("Sending the previous Circle modified to the recognizer : \n");
+	printMatch(format(getmCircle()), templates);
 	
 	getchar();
 	
