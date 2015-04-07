@@ -379,6 +379,7 @@ linked_List* getSquare()
 	addLast(points, new_point(200,150,0,0,0));
  	addLast(points, new_point(200,100,0,0,0));
 	addLast(points, new_point(150,100,0,0,0));
+	addLast(points, new_point(100,100,0,0,0));
 	return points;
 }
 
@@ -401,6 +402,7 @@ linked_List* getCircle()
 	addLast(points, new_point(-375,150,0,0,0));
 	addLast(points, new_point(-300,300,0,0,0));
 	addLast(points, new_point(-150,375,0,0,0));
+	addLast(points, new_point(0,400,0,0,0));
 	return points;
 }
 
@@ -410,7 +412,7 @@ linked_List* getmCircle()
 	addLast(points, new_point(0,400,0,0,0));
 	addLast(points, new_point(133,370,0,0,0));
 	addLast(points, new_point(300,300,0,0,0));
-	addLast(points, new_point(350,250,0,0,0));
+	addLast(points, new_point(390,250,0,0,0));
 	addLast(points, new_point(400,0,0,0,0));
 	addLast(points, new_point(380,-100,0,0,0));
 	addLast(points, new_point(300,-300,0,0,0));
@@ -418,11 +420,12 @@ linked_List* getmCircle()
 	addLast(points, new_point(0,-400,0,0,0));
 	addLast(points, new_point(-160,-385,0,0,0));
 	addLast(points, new_point(-300,-300,0,0,0));
-	addLast(points, new_point(-375,-250,0,0,0));
-	addLast(points, new_point(-400,0,0,0,0));
+	addLast(points, new_point(-350,-200,0,0,0));
+	addLast(points, new_point(-375,0,0,0,0));
 	addLast(points, new_point(-390,155,0,0,0));
 	addLast(points, new_point(-300,300,0,0,0));
 	addLast(points, new_point(-155,390,0,0,0));
+	addLast(points, new_point(0,395,0,0,0));
 	return points;
 }
 
@@ -441,13 +444,14 @@ linked_List* getTriangle()
 	addLast(points, new_point(450,150,0,0,0));
 	addLast(points, new_point(400,200,0,0,0));
 	addLast(points, new_point(350,250,0,0,0));
+	addLast(points, new_point(300,300,0,0,0));
 	return points;
 }
 
 linked_List* getmTriangle()
 {
 	linked_List* points = emptyList();
-	addLast(points, new_point(290,300,0,0,0));
+	addLast(points, new_point(270,300,0,0,0));
 	addLast(points, new_point(250,220,0,0,0));
 	addLast(points, new_point(200,200,0,0,0));
 	addLast(points, new_point(150,150,0,0,0));
@@ -459,6 +463,7 @@ linked_List* getmTriangle()
 	addLast(points, new_point(440,160,0,0,0));
 	addLast(points, new_point(400,200,0,0,0));
 	addLast(points, new_point(350,250,0,0,0));
+	addLast(points, new_point(300,300,0,0,0));
 	return points;
 }
 
@@ -475,6 +480,7 @@ void saveStar(Template** templates)
 	addLast(star, new_point(150,250,0,0,0));
 	addLast(star, new_point(0,400,0,0,0));
 	addLast(star, new_point(200,400,0,0,0));
+	addLast(star, new_point(300,600,0,0,0));
 	saveTemplate(format(star), "star", templates);
 }
 
@@ -491,7 +497,22 @@ void printMatch(linked_List* points, Template** templates)
 
 void step_by_step(Template** templates)
 {
-	printf("Templates successfully loaded !\n");
+	printf("Current templates vector is empty !\n");
+	
+	getchar();
+	
+	saveStar(templates);
+	templates = loadTemplates();
+	
+	int i = 0;
+	while(templates[i] != NULL)
+	{
+		printTemplate(templates[i]);
+		printf("\n");
+		i++;
+	}
+	
+	printf("\nTemplates successfully loaded !\n");
 	
 	getchar();
 	
@@ -530,10 +551,12 @@ void step_by_step(Template** templates)
 	saveTemplate(format(Square), "Square", templates);
 	saveTemplate(format(Triangle), "Triangle", templates);
 	printf("Saved Circle, Square and Triangle !\nDisplaying saved templates :\n");
-	int i = 0;
+	
+	i = 0;
 	while(templates[i] != NULL)
 	{
 		printTemplate(templates[i]);
+		printf("\n");
 		i++;
 	}
 	
@@ -580,7 +603,9 @@ int main()
 	printf("\033[1;1H\033[2J"); //clear console
 	
  	Template** templates = loadTemplates();
- 	saveStar(templates);
 	step_by_step(templates);
+	
+	getchar();
+	
 	return 0;
 }
