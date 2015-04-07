@@ -106,9 +106,9 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, GtkWidg
 { 
       gtk_widget_queue_draw( GTK_WIDGET( widget ));
       IplImage *image_cam= cvQueryFrame(capture);
-	  for_gtk(image_cam);
+//	  for_gtk(image_cam);
       //filtre_forme(image_cam);
-     // image = convertOpenCv2Gtk(image_cam);
+      image = convertOpenCv2Gtk(image_cam);
 
 
     gdk_draw_pixbuf( widget->window,
@@ -120,7 +120,7 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, GtkWidg
                     GDK_RGB_DITHER_MAX,
                     0, 0);
     
- //   red_up(red);
+//    red_up(red);
 
     return TRUE;
 
@@ -216,7 +216,7 @@ int init_gtk(int argc, char **argv){
 //  g_timeout_add_full(G_PRIORITY_HIGH,200,green_up,green_c,NULL);
 //  g_timeout_add_full(G_PRIORITY_HIGH,200,blue_up,blue_c ,NULL);
   //  g_timeout_add_full(G_PRIORITY_HIGH,100,green_up,green ,NULL);
-  //  g_timeout_add_full(G_PRIORITY_HIGH,100,blue_up,blue ,NULL);
+ //   g_timeout_add_full(G_PRIORITY_HIGH,100,blue_up,blue ,NULL);
     g_signal_connect( G_OBJECT( drawing_area), "expose_event", G_CALLBACK (expose_event_callback),red_c);
     g_timeout_add( 130, ( GSourceFunc )time_handler, ( gpointer )drawing_area );
  

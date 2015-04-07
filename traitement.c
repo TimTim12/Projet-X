@@ -137,7 +137,7 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels) {
 }
 
 
-void addObjectToVideo1(IplImage* image, CvPoint objectNextPos, int nbPixels, int fd) {
+void addObjectToVideo1(IplImage* image, CvPoint objectNextPos, int nbPixels, int fd, int a) {
       //  Point p = NULL;
       //  new_point1(p,0,0,0,0,0);
 	int objectNextStepX, objectNextStepY;
@@ -166,6 +166,7 @@ void addObjectToVideo1(IplImage* image, CvPoint objectNextPos, int nbPixels, int
 		objectPos.x = -1;
 		objectPos.y = -1;
 	}   
+        if(a>0)
         set_coord_mouse(fd, -(objectPos.x* 1366)/620, (objectPos.y* 768)/480);
         //set_coord_mouse(fd, -objectPos.x* 2, objectPos.y* 2);
 	//Dessine moi un mouton	
@@ -217,14 +218,15 @@ int traitement(){
 
 		// clique souris
 		cvSetMouseCallback("Color Tracking", getObjectColor);
+                int a = 0;
                 //int fd = connect_mouse("/dev/input/event12");
                 while(key != 'q' && key != 'Q') {
 			image2  = cvQueryFrame(capture);
 			objectNextPos = binarisation(image2, &nbPixels);
 			if( key == 'r') 
-                        { fd = connect_mouse("/dev/input/event12"); }
+                        { fd = connect_mouse("/dev/input/event12");a = 1;}
                         else
-                            addObjectToVideo1(image2, objectNextPos, nbPixels, fd);
+                            addObjectToVideo1(image2, objectNextPos, nbPixels, fd, a);
 			//affiche et attend entré clavier pendant 10ms
 			key = cvWaitKey(10);
 		}

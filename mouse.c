@@ -59,7 +59,6 @@ void set_coord_mouse(int fd, int x, int y){
     eventy.type = EV_REL;//set the type of the eventx to relative.
     eventy.code = REL_Y;//tell the code of eventx to relative value of y.     
 
-    printf("add: %d \n",x - posX);
     eventy.value = newY;
     write(fd, &eventy, sizeof(eventy));
     event_end.type = EV_SYN;
