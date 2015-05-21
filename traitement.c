@@ -18,9 +18,10 @@
 #define STEP_MAX 100 
 
 // Position de l'objet, "couleur", seuil de tolérance
-CvPoint objectPos = cvPoint(-1, -1);
-int h = 0, s = 0, v = 0, tolerance = 10;
-int fd;
+CvPoint objectPos[3] = {cvPoint(-1, -1), cvPoint(-1,-1), cvPoint(-1,-1)};
+int h[3] = {0,0,0}, s[3] = {0,0,0}, v[3] = {0,0,0};
+int tolerance = 10, fd, cint = 0;
+
 IplImage *image2;
 
 
@@ -175,7 +176,7 @@ IplImage* RGBtoHSV(const IplImage *imageRGB)
 }
 
 
-CvPoint binarisation(IplImage* image, int *nbPixels) {
+CvPoint binarisation(IplImage* image, int *nbPixels, int cint) {
 
 	int x, y;
 	CvScalar pixel;
@@ -193,7 +194,7 @@ CvPoint binarisation(IplImage* image, int *nbPixels) {
 	hsv = RGBtoHSV(image);
 
 	//mets à jour le masque
-	cvInRangeS(hsv, cvScalar(h - tolerance -1, s - tolerance, 0), cvScalar(h + tolerance -1, s + tolerance, 255), mask);
+	cvInRangeS(hsv, cvScalar(h[cint] - tolerance -1, s[cint] - tolerance, 0), cvScalar(h[cint] + tolerance -1, s[cint] + tolerance, 255), mask);
 
 	//élimination des pixel isolé 
 	kernel = cvCreateStructuringElementEx(5, 5, 2, 2, CV_SHAPE_ELLIPSE);
@@ -228,8 +229,7 @@ CvPoint binarisation(IplImage* image, int *nbPixels) {
 
 
 
-
-void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels) {
+void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels, int fd, int a,int cint) {
 	//  Point p = NULL;
 	//  new_point1(p,0,0,0,0,0);
 	int objectNextStepX, objectNextStepY;
@@ -237,71 +237,33 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels) {
 	if (nbPixels > 10) {
 
 		// Reset position 
-		if (objectPos.x == -1 || objectPos.y == -1) {
-			objectPos.x = objectNextPos.x;
-			objectPos.y = objectNextPos.y;
+		if (objectPos[cint].x == -1 || objectPos[cint].y == -1) {
+			objectPos[cint].x = objectNextPos.x;
+			objectPos[cint].y = objectNextPos.y;
 		}
 
 		//lissage du déplacement 
-		if (abs(objectPos.x - objectNextPos.x) > STEP_MIN) {
-			objectNextStepX = max(STEP_MIN, min(STEP_MAX, abs(objectPos.x - objectNextPos.x) / 2));
-			objectPos.x += (-1) * sign(objectPos.x - objectNextPos.x) * objectNextStepX;
+		if (abs(objectPos[cint].x - objectNextPos.x) > STEP_MIN) {
+			objectNextStepX = max(STEP_MIN, min(STEP_MAX, abs(objectPos[cint].x - objectNextPos.x) / 2));
+			objectPos[cint].x += (-1) * sign(objectPos[cint].x - objectNextPos.x) * objectNextStepX;
 		}
-		if (abs(objectPos.y - objectNextPos.y) > STEP_MIN) {
-			objectNextStepY = max(STEP_MIN, min(STEP_MAX, abs(objectPos.y - objectNextPos.y) / 2));
-			objectPos.y += (-1) * sign(objectPos.y - objectNextPos.y) * objectNextStepY;
+		if (abs(objectPos[cint].y - objectNextPos.y) > STEP_MIN) {
+			objectNextStepY = max(STEP_MIN, min(STEP_MAX, abs(objectPos[cint].y - objectNextPos.y) / 2));
+			objectPos[cint].y += (-1) * sign(objectPos[cint].y - objectNextPos.y) * objectNextStepY;
 		}
 
 		// -1 = objet hors caméra
 	} else {
 
-		objectPos.x = -1;
-		objectPos.y = -1;
-	}
-
-	//Dessine moi un mouton	
-	if (nbPixels > 10)
-		cvDrawCircle(image, objectPos, 5, CV_RGB(255, 0, 0), -1);
-	cvShowImage("Color Tracking", image);
-	printf("%d %d", image2->width, image2->height);
-}
-
-
-void addObjectToVideo1(IplImage* image, CvPoint objectNextPos, int nbPixels, int fd, int a) {
-	//  Point p = NULL;
-	//  new_point1(p,0,0,0,0,0);
-	int objectNextStepX, objectNextStepY;
-
-	if (nbPixels > 10) {
-
-		// Reset position 
-		if (objectPos.x == -1 || objectPos.y == -1) {
-			objectPos.x = objectNextPos.x;
-			objectPos.y = objectNextPos.y;
-		}
-
-		//lissage du déplacement 
-		if (abs(objectPos.x - objectNextPos.x) > STEP_MIN) {
-			objectNextStepX = max(STEP_MIN, min(STEP_MAX, abs(objectPos.x - objectNextPos.x) / 2));
-			objectPos.x += (-1) * sign(objectPos.x - objectNextPos.x) * objectNextStepX;
-		}
-		if (abs(objectPos.y - objectNextPos.y) > STEP_MIN) {
-			objectNextStepY = max(STEP_MIN, min(STEP_MAX, abs(objectPos.y - objectNextPos.y) / 2));
-			objectPos.y += (-1) * sign(objectPos.y - objectNextPos.y) * objectNextStepY;
-		}
-
-		// -1 = objet hors caméra
-	} else {
-
-		objectPos.x = -1;
-		objectPos.y = -1;
+		objectPos[cint].x = -1;
+		objectPos[cint].y = -1;
 	}   
 	if(a>0)
-		set_coord_mouse(fd, -(objectPos.x* 1366)/620, (objectPos.y* 768)/480);
+		set_coord_mouse(fd, -(objectPos[cint].x* 1366)/620, (objectPos[cint].y* 768)/480);
 	//set_coord_mouse(fd, -objectPos.x* 2, objectPos.y* 2);
 	//Dessine moi un mouton	
 	if (nbPixels > 10)
-		cvDrawCircle(image, objectPos, 5, CV_RGB(255, 0, 0), -1);
+		cvDrawCircle(image, objectPos[cint], 5, CV_RGB(255, 0, 0), -1);
 	cvShowImage("Color Tracking", image);
 }
 
@@ -317,12 +279,28 @@ void getObjectColor(int event, int x, int y, int flags, void *param) {
 		//cvCvtColor(image2, hsv, CV_BGR2HSV);
 		hsv = RGBtoHSV(image2);
 		pixel = cvGet2D(hsv, y, x);
-
+		
 		// Mets à jour la couleur rechercher
-		h = (int)pixel.val[0];
-		s = (int)pixel.val[1];
-		v = (int)pixel.val[2];
+		h[cint] = (int)pixel.val[0];
+		s[cint] = (int)pixel.val[1];
+		v[cint] = (int)pixel.val[2];
+		
+		printf("-------");
+		for (int c=0; c <3; c++) {
+		printf("\nh(%d):%d",c, h[c]);
+		printf("\ns(%d):%d",c, s[c]);
+		printf("\nv(%d):%d\n",c, v[c]);
+		}
 
+
+		/*h[] = (int)pixel.val[0];
+		s[] = (int)pixel.val[1];
+		v[] = (int)pixel.val[2];
+
+		h[] = (int)pixel.val[0];
+		s[] = (int)pixel.val[1];
+		v[] = (int)pixel.val[2];
+*/
 		cvReleaseImage(&hsv);
 	}
 
@@ -334,8 +312,8 @@ int traitement(){
 	//p = new_point(0,0,0,0,0);
 	char key;
 	IplImage *hsv;
-	int nbPixels;
-	CvPoint objectNextPos;
+	int nbPixels[3];
+	CvPoint oNPR,oNPG, oNPB ; //objectNextPos
 	CvCapture *capture = cvCreateCameraCapture( CV_CAP_ANY );  //capte image caméra
 	if (!capture) {
 		printf("Ouverture du flux vidéo impossible !\n");
@@ -343,7 +321,7 @@ int traitement(){
 		//fait les fenêtre
 
 		cvNamedWindow("Color Tracking", CV_WINDOW_AUTOSIZE);
-		cvNamedWindow("Mask", CV_WINDOW_AUTOSIZE);
+		cvNamedWindow("Mask1", CV_WINDOW_AUTOSIZE);
 		cvMoveWindow("Color Tracking", 0, 100);
 		cvMoveWindow("Mask", 650, 100);
 
@@ -353,11 +331,22 @@ int traitement(){
 		//int fd = connect_mouse("/dev/input/event12");
 		while(key != 'q' && key != 'Q') {
 			image2  = cvQueryFrame(capture);
-			objectNextPos = binarisation(image2, &nbPixels);
-			if( key == 'r') 
+			if(key == 'r')
+				cint = 0;
+			if(key == 'g')
+				cint = 1;
+			if(key == 'b')
+				cint = 2;
+
+			oNPR = binarisation(image2, &nbPixels[0], 0);
+			oNPG = binarisation(image2, &nbPixels[1], 1);
+			oNPB = binarisation(image2, &nbPixels[2], 2);
+			if( key == 's') 
 			{ fd = connect_mouse("/dev/input/event14");a = 1;}
 			else
-				addObjectToVideo1(image2, objectNextPos, nbPixels, fd, a);
+			addObjectToVideo(image2, oNPR, nbPixels[0], fd, a, 0);
+			addObjectToVideo(image2, oNPG, nbPixels[1], fd, a, 1);
+			addObjectToVideo(image2, oNPB, nbPixels[2], fd, a, 2);
 			//affiche et attend entré clavier pendant 10ms
 			key = cvWaitKey(10);
 		}
@@ -375,7 +364,7 @@ int traitement(){
 }
 
 
-void for_gtk(IplImage *image){
+/*void for_gtk(IplImage *image){
 	int nbPixels;
 	//Point p;
 	//p = new_point(0,0,0,0,0);
@@ -383,4 +372,4 @@ void for_gtk(IplImage *image){
 	cvSetMouseCallback("Color Tracking", getObjectColor);
 	objectNextPos = binarisation(image, &nbPixels);
 	addObjectToVideo(image, objectNextPos, nbPixels);
-}
+}*/
