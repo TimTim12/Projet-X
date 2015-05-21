@@ -45,6 +45,134 @@ int get_yv() {
 	    return yv;
 }
 
+IplImage* RGBtoHSV(const IplImage *imageRGB)
+{
+	float fR, fG, fB;
+	float fH, fS, fV;
+	const float FLOAT_TO_BYTE = 255.0f;
+	const float BYTE_TO_FLOAT = 1.0f / FLOAT_TO_BYTE;
+
+	// Create a blank HSV image
+	IplImage *imageHSV = cvCreateImage(cvGetSize(imageRGB), 8, 3);
+	if (!imageHSV || imageRGB->depth != 8 || imageRGB->nChannels != 3) {
+		printf("ERROR in convertImageRGBtoHSV()! Bad input image.\n");
+		exit(1);
+	}
+
+	int h = imageRGB->height;		// Pixel height.
+	int w = imageRGB->width;		// Pixel width.
+	int rowSizeRGB = imageRGB->widthStep;	// Size of row in bytes, including extra padding.
+	char *imRGB = imageRGB->imageData;	// Pointer to the start of the image pixels.
+	int rowSizeHSV = imageHSV->widthStep;	// Size of row in bytes, including extra padding.
+	char *imHSV = imageHSV->imageData;	// Pointer to the start of the image pixels.
+	for (int y=0; y<h; y++) {
+		for (int x=0; x<w; x++) {
+			// Get the RGB pixel components. NOTE that OpenCV stores RGB pixels in B,G,R order.
+			uchar *pRGB = (uchar*)(imRGB + y*rowSizeRGB + x*3);
+			int bB = *(uchar*)(pRGB+0);	// Blue component
+			int bG = *(uchar*)(pRGB+1);	// Green component
+			int bR = *(uchar*)(pRGB+2);	// Red component
+
+			// Convert from 8-bit integers to floats.
+			fR = bR * BYTE_TO_FLOAT;
+			fG = bG * BYTE_TO_FLOAT;
+			fB = bB * BYTE_TO_FLOAT;
+
+			// Convert from RGB to HSV, using float ranges 0.0 to 1.0.
+			float fDelta;
+			float fMin, fMax;
+			int iMax;
+			// Get the min and max, but use integer comparisons for slight speedup.
+			if (bB < bG) {
+				if (bB < bR) {
+					fMin = fB;
+					if (bR > bG) {
+						iMax = bR;
+						fMax = fR;
+					}
+					else {
+						iMax = bG;
+						fMax = fG;
+					}
+				}
+				else {
+					fMin = fR;
+					fMax = fG;
+					iMax = bG;
+				}
+			}
+			else {
+				if (bG < bR) {
+					fMin = fG;
+					if (bB > bR) {
+						fMax = fB;
+						iMax = bB;
+					}
+					else {
+						fMax = fR;
+						iMax = bR;
+					}
+				}
+				else {
+					fMin = fR;
+					fMax = fB;
+					iMax = bB;
+				}
+			}
+			fDelta = fMax - fMin;
+			fV = fMax;				// Value (Brightness).
+			if (iMax != 0) {			// Make sure it's not pure black.
+				fS = fDelta / fMax;		// Saturation.
+				float ANGLE_TO_UNIT = 1.0f / (6.0f * fDelta);	// Make the Hues between 0.0 to 1.0 instead of 6.0
+				if (iMax == bR) {		// between yellow and magenta.
+					fH = (fG - fB) * ANGLE_TO_UNIT;
+				}
+				else if (iMax == bG) {		// between cyan and yellow.
+					fH = (2.0f/6.0f) + ( fB - fR ) * ANGLE_TO_UNIT;
+				}
+				else {				// between magenta and cyan.
+					fH = (4.0f/6.0f) + ( fR - fG ) * ANGLE_TO_UNIT;
+				}
+				// Wrap outlier Hues around the circle.
+				if (fH < 0.0f)
+					fH += 1.0f;
+				if (fH >= 1.0f)
+					fH -= 1.0f;
+			}
+			else {
+				// color is pure Black.
+				fS = 0;
+				fH = 0;	// undefined hue
+			}
+
+			// Convert from floats to 8-bit integers.
+			int bH = (int)(0.5f + fH * 255.0f);
+			int bS = (int)(0.5f + fS * 255.0f);
+			int bV = (int)(0.5f + fV * 255.0f);
+
+			// Clip the values to make sure it fits within the 8bits.
+			if (bH > 255)
+				bH = 255;
+			if (bH < 0)
+				bH = 0;
+			if (bS > 255)
+				bS = 255;
+			if (bS < 0)
+				bS = 0;
+			if (bV > 255)
+				bV = 255;
+			if (bV < 0)
+				bV = 0;
+
+			// Set the HSV pixel components.
+			uchar *pHSV = (uchar*)(imHSV + y*rowSizeHSV + x*3);
+			*(pHSV+0) = bH;		// H component
+			*(pHSV+1) = bS;		// S component
+			*(pHSV+2) = bV;		// V component
+		}
+	}
+	return imageHSV;
+}
 
 
 CvPoint binarisation(IplImage* image, int *nbPixels) {
@@ -60,9 +188,10 @@ CvPoint binarisation(IplImage* image, int *nbPixels) {
 	mask = cvCreateImage(cvGetSize(image), image->depth, 1);
 
 	// image (Hue, Saturation, Value, en français : TSV – Teinte, Saturation, Valeur)
-	hsv = cvCloneImage(image);
-	cvCvtColor(image, hsv, CV_BGR2HSV);
-	
+	//hsv = cvCloneImage(image);
+	//cvCvtColor(image, hsv, CV_BGR2HSV);
+	hsv = RGBtoHSV(image);
+
 	//mets à jour le masque
 	cvInRangeS(hsv, cvScalar(h - tolerance -1, s - tolerance, 0), cvScalar(h + tolerance -1, s + tolerance, 255), mask);
 
@@ -82,7 +211,7 @@ CvPoint binarisation(IplImage* image, int *nbPixels) {
 		}
 	}
 
-	
+
 	cvShowImage("Mask", mask);
 
 	//free tout 
@@ -101,8 +230,8 @@ CvPoint binarisation(IplImage* image, int *nbPixels) {
 
 
 void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels) {
-      //  Point p = NULL;
-      //  new_point1(p,0,0,0,0,0);
+	//  Point p = NULL;
+	//  new_point1(p,0,0,0,0,0);
 	int objectNextStepX, objectNextStepY;
 
 	if (nbPixels > 10) {
@@ -134,12 +263,13 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels) {
 	if (nbPixels > 10)
 		cvDrawCircle(image, objectPos, 5, CV_RGB(255, 0, 0), -1);
 	cvShowImage("Color Tracking", image);
+	printf("%d %d", image2->width, image2->height);
 }
 
 
 void addObjectToVideo1(IplImage* image, CvPoint objectNextPos, int nbPixels, int fd, int a) {
-      //  Point p = NULL;
-      //  new_point1(p,0,0,0,0,0);
+	//  Point p = NULL;
+	//  new_point1(p,0,0,0,0,0);
 	int objectNextStepX, objectNextStepY;
 
 	if (nbPixels > 10) {
@@ -166,9 +296,9 @@ void addObjectToVideo1(IplImage* image, CvPoint objectNextPos, int nbPixels, int
 		objectPos.x = -1;
 		objectPos.y = -1;
 	}   
-        if(a>0)
-        set_coord_mouse(fd, -(objectPos.x* 1366)/620, (objectPos.y* 768)/480);
-        //set_coord_mouse(fd, -objectPos.x* 2, objectPos.y* 2);
+	if(a>0)
+		set_coord_mouse(fd, -(objectPos.x* 1366)/620, (objectPos.y* 768)/480);
+	//set_coord_mouse(fd, -objectPos.x* 2, objectPos.y* 2);
 	//Dessine moi un mouton	
 	if (nbPixels > 10)
 		cvDrawCircle(image, objectPos, 5, CV_RGB(255, 0, 0), -1);
@@ -180,11 +310,12 @@ void getObjectColor(int event, int x, int y, int flags, void *param) {
 
 	CvScalar pixel;
 	IplImage *hsv;
-        //fd = connect_mouse("/dev/input/event12");
+	//fd = connect_mouse("/dev/input/event12");
 	if(event == CV_EVENT_LBUTTONUP) {
 
-		hsv = cvCloneImage(image2);
-		cvCvtColor(image2, hsv, CV_BGR2HSV);
+		//hsv = cvCloneImage(image2);
+		//cvCvtColor(image2, hsv, CV_BGR2HSV);
+		hsv = RGBtoHSV(image2);
 		pixel = cvGet2D(hsv, y, x);
 
 		// Mets à jour la couleur rechercher
@@ -218,19 +349,19 @@ int traitement(){
 
 		// clique souris
 		cvSetMouseCallback("Color Tracking", getObjectColor);
-                int a = 0;
-                //int fd = connect_mouse("/dev/input/event12");
-                while(key != 'q' && key != 'Q') {
+		int a = 0;
+		//int fd = connect_mouse("/dev/input/event12");
+		while(key != 'q' && key != 'Q') {
 			image2  = cvQueryFrame(capture);
 			objectNextPos = binarisation(image2, &nbPixels);
 			if( key == 'r') 
-                        { fd = connect_mouse("/dev/input/event14");a = 1;}
-                        else
-                            addObjectToVideo1(image2, objectNextPos, nbPixels, fd, a);
+			{ fd = connect_mouse("/dev/input/event14");a = 1;}
+			else
+				addObjectToVideo1(image2, objectNextPos, nbPixels, fd, a);
 			//affiche et attend entré clavier pendant 10ms
 			key = cvWaitKey(10);
 		}
-                close(fd);
+		close(fd);
 		//free tout
 		printf("\nimage de taille : %dx%d\n", image2->width, image2->height);
 
