@@ -24,27 +24,27 @@ int tolerance = 10, fd, cint = 0;
 
 IplImage *image2;
 
-
 int xr=0,yr=0,xb=0,yb=0,xv=0,yv=0;
 
 int get_xr() {
-	    return xr;
+		    return xr;
 }
 int get_yr() {
-	    return yr;
+		    return yr;
 }
 int get_xb() {
-	    return xb;
+		    return xb;
 }
 int get_yb() {
-	    return yb;
+		    return yb;
 }
 int get_xv() {
-	    return xv;
+		    return xv;
 }
 int get_yv() {
-	    return yv;
+		    return yv;
 }
+
 
 IplImage* RGBtoHSV(const IplImage *imageRGB)
 {
@@ -176,11 +176,11 @@ IplImage* RGBtoHSV(const IplImage *imageRGB)
 }
 
 
-CvPoint binarisation(IplImage* image, int *nbPixels, int cint) {
+CvPoint binarisation(IplImage* image, IplImage* hsv, int *nbPixels, int cint) {
 
 	int x, y;
 	CvScalar pixel;
-	IplImage *hsv, *mask;
+	IplImage *mask;
 	IplConvKernel *kernel;
 	int sommeX = 0, sommeY = 0;
 	*nbPixels = 0;
@@ -191,7 +191,7 @@ CvPoint binarisation(IplImage* image, int *nbPixels, int cint) {
 	// image (Hue, Saturation, Value, en français : TSV – Teinte, Saturation, Valeur)
 	//hsv = cvCloneImage(image);
 	//cvCvtColor(image, hsv, CV_BGR2HSV);
-	hsv = RGBtoHSV(image);
+	//hsv = RGBtoHSV(image);
 
 	//mets à jour le masque
 	cvInRangeS(hsv, cvScalar(h[cint] - tolerance -1, s[cint] - tolerance, 0), cvScalar(h[cint] + tolerance -1, s[cint] + tolerance, 255), mask);
@@ -218,7 +218,7 @@ CvPoint binarisation(IplImage* image, int *nbPixels, int cint) {
 	//free tout 
 	cvReleaseStructuringElement(&kernel);
 	cvReleaseImage(&mask);
-	cvReleaseImage(&hsv);
+	
 
 	//si pas d'objet dans la vidéo, point hors champ 
 	if(*nbPixels > 20)
@@ -285,22 +285,6 @@ void getObjectColor(int event, int x, int y, int flags, void *param) {
 		s[cint] = (int)pixel.val[1];
 		v[cint] = (int)pixel.val[2];
 		
-		printf("-------");
-		for (int c=0; c <3; c++) {
-		printf("\nh(%d):%d",c, h[c]);
-		printf("\ns(%d):%d",c, s[c]);
-		printf("\nv(%d):%d\n",c, v[c]);
-		}
-
-
-		/*h[] = (int)pixel.val[0];
-		s[] = (int)pixel.val[1];
-		v[] = (int)pixel.val[2];
-
-		h[] = (int)pixel.val[0];
-		s[] = (int)pixel.val[1];
-		v[] = (int)pixel.val[2];
-*/
 		cvReleaseImage(&hsv);
 	}
 
@@ -308,7 +292,7 @@ void getObjectColor(int event, int x, int y, int flags, void *param) {
 
 
 int traitement(){
-	//Point p;
+	//Point p;s2
 	//p = new_point(0,0,0,0,0);
 	char key;
 	IplImage *hsv;
@@ -321,7 +305,7 @@ int traitement(){
 		//fait les fenêtre
 
 		cvNamedWindow("Color Tracking", CV_WINDOW_AUTOSIZE);
-		cvNamedWindow("Mask1", CV_WINDOW_AUTOSIZE);
+		cvNamedWindow("Mask", CV_WINDOW_AUTOSIZE);
 		cvMoveWindow("Color Tracking", 0, 100);
 		cvMoveWindow("Mask", 650, 100);
 
@@ -337,10 +321,11 @@ int traitement(){
 				cint = 1;
 			if(key == 'b')
 				cint = 2;
-
-			oNPR = binarisation(image2, &nbPixels[0], 0);
-			oNPG = binarisation(image2, &nbPixels[1], 1);
-			oNPB = binarisation(image2, &nbPixels[2], 2);
+			hsv = RGBtoHSV(image2);
+			oNPR = binarisation(image2, hsv, &nbPixels[0], 0);
+			oNPG = binarisation(image2, hsv, &nbPixels[1], 1);
+			oNPB = binarisation(image2, hsv, &nbPixels[2], 2);
+			cvReleaseImage(&hsv);
 			if( key == 's') 
 			{ fd = connect_mouse("/dev/input/event14");a = 1;}
 			else
