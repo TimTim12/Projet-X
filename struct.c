@@ -9,9 +9,9 @@
 #define MIN_VIT 1000000
 #define MAX_VIT 10000000
 
-void test() {
+void test(linked_List* mvt_list) {
 	Point p = new_point(0,0,0,0,0);
-	int x = 0;
+	//int x = 0;
 	Mvt vect = new_vect();
 	
 	for (int i =0; i < 15; i++) {
@@ -68,7 +68,7 @@ void test() {
 	
 
 				/*for(int i = 0; i < 100; i++) {
-	if(i < 20)
+		if(i < 20)
 			x=i;
 		else if (i < 40)
 			x = 2*i;
@@ -78,8 +78,8 @@ void test() {
 		x = 2*i;
 		else
 			x=i;
-	set_point(p,x,100,0,0,0)*/;
-	vect_update(vect,p);
+		set_point(p,x,100,0,0,0)*/;
+		vect_update(vect,p, mvt_list);
 	}
 	printf("time=%f\n",(double)(vect[0].t -vect[1].t)/CLOCKS_PER_SEC);	
 	print_vect(vect);	
@@ -148,43 +148,14 @@ void set_Mvt(Mvt new, Mvt pred,Point pt) {
 	*new->p = *pt;
 }
 
-void vect_update(Mvt vect, Point p) {
-	linked_List* mvt_list = emptyList();
-	static int i = 0;
-	static int start = 0;
-	static int len = 0;
-	static int end = 0;
-	set_Mvt(&vect[(i+1)%VECT_LEN],&vect[(i)], p);
-	i = (i+1)%VECT_LEN;
-	if (vect[i].v > MIN_VIT) {
-		if (!start)
-			start = i;
-		len++;	
-	}else {
-		if (start && !end ) 
-			end = i-1;
-	} 
-	//if (end > 4 || len == VECT_LEN-1) { 
-		// end > 4 : Valeur arbitraire (seuil d'érreur/incohérence)
-		//fin de mouvement
-		if (i == 15) {
-			printf("\033[33mMVT DETECTER : START=%d || END=%d\033[0m\n", start, start+len-1);
-		
-		
-		//Sauvegarde mouvement en liste
-	for(int y = start; y < start+len-1; y++)
-		{
-			addLast(mvt_list, vect[y].p);
-		}
-		printList(mvt_list);
 
-		
 
-		//Fonction de traitement de mouvement, vect[start] to vect[(start+len-1)%V_L]
-	//	}
-		//start = len = end = 0;
-	}	
-}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 void print_Mvt(Mvt mvt) {
@@ -328,6 +299,46 @@ void printList(linked_List *list)
 		tmp = tmp->next;
 	}
 	printf("(%d,%d)}\n", tmp->point->x, tmp->point->y);
+}
+
+
+//returns the linked_List mvt_list filled with the mvt's points
+void vect_update(Mvt vect, Point p, linked_List* mvt_list)
+{
+	static int i = 0;
+	static int start = 0;
+	static int len = 0;
+	static int end = 0;
+	set_Mvt(&vect[(i+1)%VECT_LEN],&vect[(i)], p);
+	i = (i+1)%VECT_LEN;
+	if (vect[i].v > MIN_VIT) {
+		if (!start)
+			start = i;
+		len++;	
+	}else {
+		if (start && !end ) 
+			end = i-1;
+	} 
+	//if (end > 4 || len == VECT_LEN-1) { 
+		// end > 4 : Valeur arbitraire (seuil d'érreur/incohérence)
+		//fin de mouvement
+		if (i == 15) {
+			printf("\033[33mMVT DETECTER : START=%d || END=%d\033[0m\n", start, start+len-1);
+		
+		
+		//Sauvegarde mouvement en liste
+		for(int y = start+1; y < start+len-1; y++)
+		{
+			addLast(mvt_list, vect[y].p);
+		}
+		
+
+		
+
+		//Fonction de traitement de mouvement, vect[start] to vect[(start+len-1)%V_L]
+	//	}
+		//start = len = end = 0;
+	}	
 }
 
 /*int main() {
