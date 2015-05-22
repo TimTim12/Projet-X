@@ -6,15 +6,69 @@
 #include "struct.h"
 
 #define VECT_LEN 100
-#define MIN_VIT 300000
-#define MAX_VIT 1000000
+#define MIN_VIT 1000000
+#define MAX_VIT 10000000
 
 void test() {
 	Point p = new_point(0,0,0,0,0);
 	int x = 0;
 	Mvt vect = new_vect();
-	for(int i = 0; i < 100; i++) {
-		if(i < 20)
+	
+	for (int i =0; i < 15; i++) {
+		switch (i){
+			case 0:
+				set_point(p,0,10,0,0,0);
+				break;
+			case 1:
+				set_point(p,10,10,0,0,0);
+				break;		
+			case 2:
+				set_point(p,5,40,0,0,0);
+				break;
+			case 3:
+				set_point(p,100,100,0,0,0);
+				break;
+			case 4:
+				set_point(p,100,150,0,0,0);
+				break;
+			case 5:
+				set_point(p,100,200,0,0,0);
+				break;		
+			case 6:
+				set_point(p,150,200,0,0,0);
+				break;
+			case 7:
+				set_point(p,200,200,0,0,0);
+				break;
+			case 8:
+				set_point(p,200,150,0,0,0);
+				break;
+			case 9:
+				set_point(p,200,100,0,0,0);
+				break;		
+			case 10:
+				set_point(p,150,100,0,0,0);
+				break;
+			case 11:
+				set_point(p,100,100,0,0,0);
+				break;
+			case 12:
+				set_point(p,100,110,0,0,0);
+				break;
+			case 13:
+				set_point(p,120,120,0,0,0);
+				break;
+			case 14:
+				set_point(p,125,113,0,0,0);
+				break;		
+			case 15:
+				set_point(p,125,113,0,0,0);
+				break;
+		}
+	
+
+				/*for(int i = 0; i < 100; i++) {
+	if(i < 20)
 			x=i;
 		else if (i < 40)
 			x = 2*i;
@@ -24,7 +78,7 @@ void test() {
 		x = 2*i;
 		else
 			x=i;
-	set_point(p,x,100,0,0,0);
+	set_point(p,x,100,0,0,0)*/;
 	vect_update(vect,p);
 	}
 	printf("time=%f\n",(double)(vect[0].t -vect[1].t)/CLOCKS_PER_SEC);	
@@ -95,6 +149,7 @@ void set_Mvt(Mvt new, Mvt pred,Point pt) {
 }
 
 void vect_update(Mvt vect, Point p) {
+	linked_List* mvt_list = emptyList();
 	static int i = 0;
 	static int start = 0;
 	static int len = 0;
@@ -104,24 +159,30 @@ void vect_update(Mvt vect, Point p) {
 	if (vect[i].v > MIN_VIT) {
 		if (!start)
 			start = i;
-		len++;
-		end=0;
-		
+		len++;	
 	}else {
-		if (end > 4 && len <= 1) {
-			end=len=start=0;
-		}
-		end++;
+		if (start && !end ) 
+			end = i-1;
 	} 
-	if (end > 4 || len == VECT_LEN-1) { 
+	//if (end > 4 || len == VECT_LEN-1) { 
 		// end > 4 : Valeur arbitraire (seuil d'érreur/incohérence)
 		//fin de mouvement
-		if (len > 2) {
+		if (i == 15) {
 			printf("\033[33mMVT DETECTER : START=%d || END=%d\033[0m\n", start, start+len-1);
-		//Sauvegarde mouvement
-		//Fonction de traitement de mouvement, vect[start] to vect[(start+len-1)%V_L]
+		
+		
+		//Sauvegarde mouvement en liste
+	for(int y = start; y < start+len-1; y++)
+		{
+			addLast(mvt_list, vect[y].p);
 		}
-		start = len = end = 0;
+		printList(mvt_list);
+
+		
+
+		//Fonction de traitement de mouvement, vect[start] to vect[(start+len-1)%V_L]
+	//	}
+		//start = len = end = 0;
 	}	
 }
 
@@ -269,4 +330,7 @@ void printList(linked_List *list)
 	printf("(%d,%d)}\n", tmp->point->x, tmp->point->y);
 }
 
-
+/*int main() {
+	test();
+	return 0;
+}*/

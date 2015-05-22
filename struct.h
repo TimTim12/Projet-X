@@ -57,4 +57,11 @@ void set_Mvt(Mvt new_vect, Mvt pred, Point pt);
 void vect_update(Mvt vect, Point p);
 void print_Mvt(Mvt mvt);
 void print_vect(Mvt vect);
+
+linked_List* emptyList();
+void addFirst(linked_List* list, Point p);
+void addLast(linked_List* list, Point p);
+Element* getIndex(linked_List* list, int index);
+void addIndex(linked_List* list, int index, Point p);
+void printList(linked_List* list);
 #endif 
