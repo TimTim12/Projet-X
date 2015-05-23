@@ -22,26 +22,36 @@ CvPoint objectPos[3] = {cvPoint(-1, -1), cvPoint(-1,-1), cvPoint(-1,-1)};
 int h[3] = {0,0,0}, s[3] = {0,0,0}, v[3] = {0,0,0};
 int tolerance = 10, fd, cint = 0;
 
+int learningMode = 0;	// if 0: recognizing mode, else learning mode.
+int recordingMvt = 0;	// 1 while recording.
+linked_List *redList, *greenList, *blueList;	//list of point for each finger conatining a movement.
+
 IplImage *image2;
 
 int xr=0,yr=0,xb=0,yb=0,xv=0,yv=0;
 
-int get_xr() {
+int get_xr() 
+{
 		    return xr;
 }
-int get_yr() {
+int get_yr() 
+{
 		    return yr;
 }
-int get_xb() {
+int get_xb() 
+{
 		    return xb;
 }
-int get_yb() {
+int get_yb() 
+{
 		    return yb;
 }
-int get_xv() {
+int get_xv() 
+{
 		    return xv;
 }
-int get_yv() {
+int get_yv() 
+{
 		    return yv;
 }
 
@@ -176,7 +186,8 @@ IplImage* RGBtoHSV(const IplImage *imageRGB)
 }
 
 
-CvPoint binarisation(IplImage* image, IplImage* hsv, int *nbPixels, int cint) {
+CvPoint binarisation(IplImage* image, IplImage* hsv, int *nbPixels, int cint) 
+{
 
 	int x, y;
 	CvScalar pixel;
@@ -229,7 +240,8 @@ CvPoint binarisation(IplImage* image, IplImage* hsv, int *nbPixels, int cint) {
 
 
 
-void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels, int fd, int a,int cint) {
+void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels, int fd, int a,int cint) 
+{
 	//  Point p = NULL;
 	//  new_point1(p,0,0,0,0,0);
 	int objectNextStepX, objectNextStepY;
@@ -268,7 +280,8 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels, int 
 }
 
 
-void getObjectColor(int event, int x, int y, int flags, void *param) {
+void getObjectColor(int event, int x, int y, int flags, void *param) 
+{
 
 	CvScalar pixel;
 	IplImage *hsv;
@@ -327,13 +340,68 @@ int traitement(){
 			oNPB = binarisation(image2, hsv, &nbPixels[2], 2);
 			cvReleaseImage(&hsv);
 			if( key == 's') 
-			{ fd = connect_mouse("/dev/input/event14");a = 1;}
+			{ fd = connect_mouse("/dev/input/event14"); a = 1;}
 			else
 			addObjectToVideo(image2, oNPR, nbPixels[0], fd, a, 0);
 			addObjectToVideo(image2, oNPG, nbPixels[1], fd, a, 1);
 			addObjectToVideo(image2, oNPB, nbPixels[2], fd, a, 2);
 			//affiche et attend entré clavier pendant 10ms
 			key = cvWaitKey(10);
+			
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// FIN BOUCLE PRINCIPALE, POINTS MIS A JOUR ICI
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			//printf("point rouge : (%d,%d)\n", objectPos[0].x, objectPos[0].y); 
+			
+			if(key == 'x' || key == 'X')		// switch between learning and reco modes and stops recording.
+			{
+				recordingMvt = 0;
+				if(learningMode)
+					learningMode = 0;
+				else
+					learningMode = 1;
+				printf("Learning mode is now %s !\n", learningMode ? "On" : "Off");
+			}
+			
+			if(!learningMode)		// reconaissance
+			{
+				if(key == ' ')
+				{
+					if(!recordingMvt)		//not recording
+					{
+						recordingMvt = 1;
+					}
+					else
+					{
+						recordingMvt = 0;
+					}
+				}
+				if(recordingMvt)
+				{
+					printf("Recording in reco mode.\n");
+				}
+			}
+			else					// apprentissage
+			{
+				if(key == ' ')
+				{
+					if(!recordingMvt)
+					{
+						recordingMvt = 1;
+					}
+					else
+					{
+						recordingMvt = 0;
+					}
+				}
+				if(recordingMvt)
+				{
+					printf("Recording in learning mode.\n");
+				}
+			}
+			
+			
 		}
 		close(fd);
 		//free tout
