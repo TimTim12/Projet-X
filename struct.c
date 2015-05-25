@@ -341,7 +341,3 @@ void vect_update(Mvt vect, Point p, linked_List* mvt_list)
 	}	
 }
 
-/*int main() {
-	test();
-	return 0;
-}*/

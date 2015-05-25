@@ -352,7 +352,7 @@ int traitement(){
 			// FIN BOUCLE PRINCIPALE, POINTS MIS A JOUR ICI
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
-			//printf("point rouge : (%d,%d)\n", objectPos[0].x, objectPos[0].y); 
+			printf("point : (%d,%d)\n", objectPos[1].x, objectPos[1].y); 
 			
 			if(key == 'x' || key == 'X')		// switch between learning and reco modes and stops recording.
 			{
@@ -371,6 +371,9 @@ int traitement(){
 					if(!recordingMvt)		//not recording
 					{
 						recordingMvt = 1;
+						redList = emptyList();
+						//blueList = emptyList();
+						//greenList = emptyList();
 					}
 					else
 					{
@@ -389,6 +392,9 @@ int traitement(){
 					if(!recordingMvt)
 					{
 						recordingMvt = 1;
+						redList = emptyList();
+						//blueList = emptyList();
+						//greenList = emptyList();
 					}
 					else
 					{
