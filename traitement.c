@@ -3,12 +3,15 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 #include <iostream>
-#include "traitement.h"
 #include <string.h>
 #include <math.h>
+#include <pthread.h>
+
+
+#include "traitement.h"
 #include "mouse.h"
 #include "struct.h"
-#include "struct.c"
+#include "dollar1.h"
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))  
@@ -27,6 +30,9 @@ int tolerance = 10, fd, cint = 0;
 int learningMode = 0;	// if 0: recognizing mode, else learning mode.
 int recordingMvt = 0;	// 1 while recording.
 linked_List *redList, *greenList, *blueList;	//list of point for each finger conatining a movement.
+Template** templates; // saved templates
+pthread_t formatThread, recoThread;
+
 
 void setHSV (int sh, int ss, int sv, int c) {
 
@@ -313,10 +319,33 @@ void getObjectColor(int event, int x, int y, int flags, void *param)
 }
 
 
-IplImage * traitement(CvCapture * capture){
-	//Point p;s2
-	//p = new_point(0,0,0,0,0);
-	char key;
+// recognize the movement
+void *thread_Format_Reco(void* arg)
+{
+	printMatch(format(redList), templates);
+	
+	(void*) arg;		// avoids warning unused arg
+	
+	pthread_exit(NULL);
+}
+
+// save the template
+void *thread_Format_Save(void* arg)
+{
+	printf("Saving pattern...\n");
+	saveTemplate(format(redList), "Left", templates);
+	printf("Check succesfully saved !\n");
+	
+	(void*) arg;		// avoids warning unused arg
+	
+	pthread_exit(NULL);
+}
+
+
+IplImage *traitement(CvCapture *capture, GdkEventKey *key)
+{	
+	templates = loadTemplates();
+	
 	IplImage *hsv;
 	int nbPixels[3];
 	CvPoint oNPR,oNPG, oNPB ; //objectNextPos
@@ -348,7 +377,7 @@ IplImage * traitement(CvCapture * capture){
 			oNPG = binarisation(image2, hsv, &nbPixels[1], 1);
 			oNPB = binarisation(image2, hsv, &nbPixels[2], 2);
 			cvReleaseImage(&hsv);
-			if( key == 's') 
+			if(key != NULL && key->keyval == GDK_s) 
 			{ fd = connect_mouse("/dev/input/event14"); a = 1;}
 			else
 	        	addObjectToVideo(image2, oNPR, nbPixels[0], fd, a, 0);
@@ -361,9 +390,19 @@ IplImage * traitement(CvCapture * capture){
 			// FIN BOUCLE PRINCIPALE, POINTS MIS A JOUR ICI
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
-//			printf("point : (%d,%d)\n", objectPos[1].x, objectPos[1].y); 
 			
-	/*		if(key == 'x' || key == 'X')		// switch between learning and reco modes and stops recording.
+			if(key != NULL && key->keyval == GDK_p || key->keyval == GDK_P)
+			{
+				int i = 0;
+				while(templates[i] != NULL)
+				{
+					printTemplate(templates[i]);
+					printf("\n");
+					i++;
+				}
+			}
+			
+			if(key != NULL && key->keyval == GDK_x || key->keyval == GDK_X)		// switch between learning and reco modes and stops recording.
 			{
 				recordingMvt = 0;
 				if(learningMode)
@@ -375,7 +414,7 @@ IplImage * traitement(CvCapture * capture){
 			
 			if(!learningMode)		// reconaissance
 			{
-				if(key == ' ')
+				if(key != NULL && key->keyval == GDK_v || key->keyval == GDK_V)
 				{
 					if(!recordingMvt)		//not recording
 					{
@@ -387,16 +426,18 @@ IplImage * traitement(CvCapture * capture){
 					else
 					{
 						recordingMvt = 0;
+						printList(redList);
+						pthread_create(&recoThread, NULL, thread_Format_Reco, NULL);
 					}
 				}
 				if(recordingMvt)
 				{
-					printf("Recording in reco mode.\n");
+					addLast(redList, new_point(objectPos[0].x, objectPos[0].y, 0, 0, 0));
 				}
 			}
 			else					// apprentissage
 			{
-				if(key == ' ')
+				if(key != NULL && key->keyval == GDK_v || key->keyval == GDK_V)
 				{
 					if(!recordingMvt)
 					{
@@ -408,14 +449,15 @@ IplImage * traitement(CvCapture * capture){
 					else
 					{
 						recordingMvt = 0;
+						printList(redList);
+						pthread_create(&formatThread, NULL, thread_Format_Save, NULL);
 					}
 				}
 				if(recordingMvt)
 				{
-					printf("Recording in learning mode.\n");
+					addLast(redList, new_point(objectPos[0].x, objectPos[0].y, 0, 0, 0));
 				}
-			}
-	*/		
+			}		
 			
 		
 		close(fd);

@@ -3,6 +3,7 @@
 #include "traitement.h"
 #include "struct.h"
 #include <string.h>
+#include <gdk/gdkkeysyms.h>
 
 CvCapture *capture = NULL;
 GtkWidget *layout = NULL;
@@ -18,6 +19,8 @@ int init = 1;
 int red_init = 0;
 int green_init = 0;
 int blue_init = 0;
+GdkEventKey *event_key;
+char * figure_name = "";
 GtkWidget* convertOpenCv2Gtk (IplImage* srcImage)
 {
     GtkWidget* gtkImg = NULL;
@@ -109,7 +112,8 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, CvCaptu
    if(init){
 
       gtk_widget_queue_draw( GTK_WIDGET( widget ));
-      image_cam= traitement(cap); //cvQueryFrame(cap);
+      image_cam= traitement(cap,event_key); //cvQueryFrame(cap);
+      event_key = NULL;
 //	  for_gtk(image_cam);
       //filtre_forme(image_cam);
       image = convertOpenCv2Gtk(image_cam);
@@ -135,9 +139,13 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, CvCaptu
     return TRUE;
 
 }
+gboolean record_name(GtkWidget *widget, GdkEventExpose *event,GtkEntry *text){
+    
+    figure_name = (char*)gtk_entry_get_text(text);
+    return TRUE;
+}
 gboolean learning_mode(GtkWidget *widget, GdkEventExpose *event, GtkLabel *label) {
-        
-        if (learning){
+        if (!learning){
 
                 GtkWidget *name;
                 gtk_label_set_text(label,"Mode Apprentissage");
@@ -145,17 +153,34 @@ gboolean learning_mode(GtkWidget *widget, GdkEventExpose *event, GtkLabel *label
 
                 GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
                 GtkWidget *button = gtk_button_new_from_stock (GTK_STOCK_ADD);
+                 gtk_window_set_default_size(GTK_WINDOW(window), 250, 200);
                 gchar *title;
-                
+                GtkWidget *fixed = gtk_fixed_new();
+                GtkWidget *layout1 = gtk_layout_new(NULL, NULL);
+                gtk_container_add(GTK_CONTAINER (window), layout1);
+                gtk_widget_show(layout1);
+                gtk_container_add(GTK_CONTAINER(layout1), fixed);
+
+                  
+                button = gtk_button_new_with_label("Enregistrer");
+                gtk_fixed_put(GTK_FIXED(fixed), button, 110, 115);
+                gtk_widget_set_size_request(button, 80, 35);                
+
                 gtk_container_set_border_width (GTK_CONTAINER (window), 25);
-                name = gtk_label_new("Name");
+                name = gtk_label_new("Entrer un geste");
                 gtk_label_set_use_markup(GTK_LABEL(name), TRUE);
-                gtk_container_add( GTK_CONTAINER (window), name);
+                gtk_layout_put( GTK_LAYOUT(layout1), name, 10,10);
                 
+                GtkWidget *text = gtk_entry_new ();
+                gtk_entry_set_max_length (GTK_ENTRY (text),0);
+                gtk_layout_put(GTK_LAYOUT(layout1),text, 10, 50);
 
+    
                 //gtk_container_add (GTK_CONTAINER (window), button);
+                //
+                g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(record_name), text);
 
-                title = g_strdup_printf ("Window");
+                title = g_strdup_printf ("Mode Apprentissage");
                 gtk_window_set_title (GTK_WINDOW (window), title);
                 g_free (title);
                         
@@ -233,7 +258,14 @@ button_press_callback (GtkWidget      *event_box,
     red_init = green_init = blue_init = 0;
     return TRUE;
 }
-
+gboolean
+on_key_press (GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+{
+    event_key = event;
+       
+    return FALSE;
+    
+}
 int init_gtk(int argc, char **argv){
     //***********Initialisation*************
     IplImage *image_cam;
@@ -315,6 +347,7 @@ int init_gtk(int argc, char **argv){
 
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(init_blue),capture);
 
+    g_signal_connect (G_OBJECT (MainWindow), "key_press_event", G_CALLBACK (on_key_press), NULL);
 
     //**********Start Programm *******
     gtk_widget_show_all(MainWindow);
