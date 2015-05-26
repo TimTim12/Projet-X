@@ -10,12 +10,14 @@ GtkWidget *image = NULL;
 GtkWidget * MainWindow = NULL;
 GtkWidget* red = NULL;
 GtkWidget* green = NULL;
-GtkWidget* blue = NULL;
 GtkWidget* red_c = NULL;
-GtkWidget* green_c = NULL;
-GtkWidget* blue_c = NULL;
+IplImage *image_cam = NULL;
+int learning = 0;
 int xa = 20;
-
+int init = 1;
+int red_init = 0;
+int green_init = 0;
+int blue_init = 0;
 GtkWidget* convertOpenCv2Gtk (IplImage* srcImage)
 {
     GtkWidget* gtkImg = NULL;
@@ -102,10 +104,12 @@ gboolean blue_up( gpointer label)
 static gboolean time_handler( GtkWidget *widget) {
       return TRUE;
 }
-gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, GtkWidget *red) //Requette Webcam + traitement de l'image
-{ 
+gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, CvCapture * cap) //Requette Webcam + traitement de l'image
+{
+   if(init){
+
       gtk_widget_queue_draw( GTK_WIDGET( widget ));
-      IplImage *image_cam= cvQueryFrame(capture);
+      image_cam= traitement(cap); //cvQueryFrame(cap);
 //	  for_gtk(image_cam);
       //filtre_forme(image_cam);
       image = convertOpenCv2Gtk(image_cam);
@@ -121,10 +125,69 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, GtkWidg
                     0, 0);
     
 //    red_up(red);
-
+    }
+ /*   else{
+       printf("e");
+        fflush(stdout);
+        capture = cvCreateCameraCapture(CV_CAP_ANY);
+        return FALSE;
+    }*/
     return TRUE;
 
 }
+gboolean learning_mode(GtkWidget *widget, GdkEventExpose *event, GtkLabel *label) {
+        
+        if (learning){
+
+                GtkWidget *name;
+                gtk_label_set_text(label,"Mode Apprentissage");
+                learning = 0;
+
+                GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+                GtkWidget *button = gtk_button_new_from_stock (GTK_STOCK_ADD);
+                gchar *title;
+                
+                gtk_container_set_border_width (GTK_CONTAINER (window), 25);
+                name = gtk_label_new("Name");
+                gtk_label_set_use_markup(GTK_LABEL(name), TRUE);
+                gtk_container_add( GTK_CONTAINER (window), name);
+                
+
+                //gtk_container_add (GTK_CONTAINER (window), button);
+
+                title = g_strdup_printf ("Window");
+                gtk_window_set_title (GTK_WINDOW (window), title);
+                g_free (title);
+                        
+                gtk_widget_show_all (window);
+        }else{
+                gtk_label_set_text(label,"");
+                learning = 1;
+        }       
+        return TRUE;
+}
+gboolean init_red(GtkWidget *widget, GdkEventExpose *event, CvCapture *captur) {
+       red_init = 1;
+       green_init = blue_init = 0;
+        gtk_label_set_text( GTK_LABEL(green),"Initialisation du rouge");
+       // traitement();
+        return TRUE;
+}
+gboolean init_green(GtkWidget *widget, GdkEventExpose *event, CvCapture *captur) {
+       green_init = 1;
+       red_init = blue_init = 0;
+        gtk_label_set_text( GTK_LABEL(green),"Initialisation du vert");
+       // traitement();
+        return TRUE;
+}
+gboolean init_blue(GtkWidget *widget, GdkEventExpose *event, CvCapture *captur) {
+       blue_init = 1;
+       red_init = green_init = 0;
+        gtk_label_set_text( GTK_LABEL(green),"Initialisation du bleu");
+       // traitement();
+        return TRUE;
+}
+
 void OnScrollbarChange(GtkWidget *pWidget, gpointer data)
 {
    gchar* sLabel;
@@ -140,6 +203,37 @@ void OnScrollbarChange(GtkWidget *pWidget, gpointer data)
    g_free(sLabel);
 }
 
+static gboolean
+button_press_callback (GtkWidget      *event_box,
+                       GdkEventButton *event,
+                       gpointer        data)
+{
+    g_print ("Event box clicked at coordinates %f,%f\n",
+         event->x, event->y);
+    int x = (int)event->x;
+    int y = (int)event->y;
+    // Returning TRUE means we handled the event, so the signal
+    // emission should be stopped (don’t call any further callbacks
+    // that may be connected). Return FALSE to continue invoking callbacks.
+        CvScalar pixel;
+        IplImage *hsv;
+                hsv = RGBtoHSV(image_cam);
+                pixel = cvGet2D(hsv, y, x);
+                
+                // Mets à jour la couleur rechercher
+                
+                if (red_init)
+                    setHSV((int)pixel.val[0],(int)pixel.val[1],(int)pixel.val[2],0);
+                 if (green_init)
+                    setHSV((int)pixel.val[0],(int)pixel.val[1],(int)pixel.val[2],1);
+                 if (blue_init)
+                    setHSV((int)pixel.val[0],(int)pixel.val[1],(int)pixel.val[2],2);
+ 
+                cvReleaseImage(&hsv);
+    red_init = green_init = blue_init = 0;
+    return TRUE;
+}
+
 int init_gtk(int argc, char **argv){
     //***********Initialisation*************
     IplImage *image_cam;
@@ -152,74 +246,76 @@ int init_gtk(int argc, char **argv){
     gtk_init(&argc, &argv);//Initialisation de GTK
     MainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(MainWindow), "Projet X");
-    gtk_window_set_default_size(GTK_WINDOW(MainWindow), 600, 600); 
+    gtk_window_set_default_size(GTK_WINDOW(MainWindow), 800, 650); 
     layout = gtk_layout_new(NULL, NULL);//emplacement de la caméra
     gtk_container_add(GTK_CONTAINER (MainWindow), layout);
     gtk_widget_show(layout); 
-    //image = convertOpenCv2Gtk(image_cam);
-    //gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
 
     //*****show coord
       //Convertion du texte avec les balises
-    red =gtk_label_new("Rouge:");
-    blue =gtk_label_new("Bleu:");
-    green =gtk_label_new("Vert:");
-    red_c =gtk_label_new("0x0");
-   /* blue_c =gtk_label_new("");
-    green_c =gtk_label_new("");
+    red =gtk_label_new("Résultat");
+    gtk_label_set_use_markup(GTK_LABEL(red), TRUE);
+    gtk_layout_put(GTK_LAYOUT(layout), red, 300,600);
 
-*/
-    gtk_label_set_use_markup(GTK_LABEL(red), TRUE);/*
-    gtk_label_set_use_markup(GTK_LABEL(blue), TRUE);
-    gtk_label_set_use_markup(GTK_LABEL(green), TRUE);*/
-    gtk_layout_put(GTK_LAYOUT(layout), red, 20,600);
-  //  gtk_layout_put(GTK_LAYOUT(layout), green, 220,600);
-  //  gtk_layout_put(GTK_LAYOUT(layout), blue, 420,600);
-    gtk_layout_put(GTK_LAYOUT(layout), red_c, 70,600);
-  //  gtk_layout_put(GTK_LAYOUT(layout), green_c, 260,600);
-  //  gtk_layout_put(GTK_LAYOUT(layout), blue_c, 460,600);
+     GtkWidget *fixed;
 
-/*   GtkWidget *pLabel;
-   GtkWidget *pScrollbar;
-   GtkObject *Adjust;
-   GtkWidget *pColorBox;
-   GtkWidget *pFrame;
-   GtkWidget *pMainVBox;
+    fixed = gtk_fixed_new();
+    
+    GtkWidget *event_box;
 
-   pMainVBox = gtk_vbox_new(TRUE, 0);
-   gtk_layout_put(GTK_LAYOUT(layout), pMainVBox,500,500);
+    event_box = gtk_event_box_new ();    
 
-   pFrame = gtk_frame_new("Rouge");
-   gtk_box_pack_start(GTK_BOX(pMainVBox), pFrame, FALSE, FALSE, 0);
-   pColorBox = gtk_vbox_new(TRUE, 0);
-   gtk_container_add(GTK_CONTAINER(pFrame), pColorBox);*/
-
-   /* Label d'affichage de valeur R*/
- //  pLabel = gtk_label_new("0");
- //  gtk_box_pack_start(GTK_BOX(pColorBox), pLabel, FALSE, FALSE, 0);
-   /* Création d un GtkAdjustment */
- //  Adjust = gtk_adjustment_new(0, 0, 256, 1, 10, 1);
-   /* Creation d une scrollbar horizontale*/
- //  pScrollbar = gtk_hscrollbar_new(GTK_ADJUSTMENT(Adjust));
- //  gtk_box_pack_start(GTK_BOX(pColorBox), pScrollbar, TRUE, TRUE, 0);
-   /* Connexion du signal pour modification de l'affichage */
-   //g_signal_connect(G_OBJECT(pScrollbar), "value-changed",
-//      G_CALLBACK(OnScrollbarChange), (GtkWidget*)pLabel);
-
-  //  int func_ref = g_timeout_add_full(G_PRIORITY_HIGH,130,callback,image ,NULL);//loop traitement image + affichage (callback)
     drawing_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request( drawing_area,900,500);
-    gtk_container_add( GTK_CONTAINER( layout ), drawing_area );
+    gtk_widget_set_size_request( drawing_area,640,480);
+    gtk_container_add(GTK_CONTAINER(layout), fixed);
+    //gtk_container_add( GTK_CONTAINER( layout ), drawing_area );
+    gtk_container_add (GTK_CONTAINER (event_box), drawing_area);
+    gtk_fixed_put(GTK_FIXED(fixed), event_box, 30, 100);
     g_signal_connect_swapped(G_OBJECT(MainWindow), "destroy",
     G_CALLBACK(gtk_main_quit), NULL);//bouton quitter propre
-//    g_timeout_add_full(G_PRIORITY_HIGH,200,red_up,red_c,NULL);
-//  g_timeout_add_full(G_PRIORITY_HIGH,200,green_up,green_c,NULL);
-//  g_timeout_add_full(G_PRIORITY_HIGH,200,blue_up,blue_c ,NULL);
-  //  g_timeout_add_full(G_PRIORITY_HIGH,100,green_up,green ,NULL);
- //   g_timeout_add_full(G_PRIORITY_HIGH,100,blue_up,blue ,NULL);
-    g_signal_connect( G_OBJECT( drawing_area), "expose_event", G_CALLBACK (expose_event_callback),red_c);
-    g_timeout_add( 130, ( GSourceFunc )time_handler, ( gpointer )drawing_area );
- 
+    g_signal_connect( G_OBJECT( drawing_area), "expose_event", G_CALLBACK (expose_event_callback),capture);
+    g_timeout_add(10, ( GSourceFunc )time_handler, ( gpointer )drawing_area );
+
+//    GtkWidget *fixed;
+
+    g_signal_connect (G_OBJECT (event_box),
+                  "button_press_event",
+                  G_CALLBACK (button_press_callback),
+                  drawing_area);
+
+  //  fixed = gtk_fixed_new();
+    //gtk_container_add(GTK_CONTAINER(layout), fixed);
+
+        
+    green =gtk_label_new("Mode APPRENTISSAGE");
+    gtk_label_set_use_markup(GTK_LABEL(green), TRUE);
+    gtk_layout_put(GTK_LAYOUT(layout), green, 280,625);
+
+    button = gtk_button_new_with_label("APPRENDRE");
+    gtk_fixed_put(GTK_FIXED(fixed), button, 30, 50);
+    gtk_widget_set_size_request(button, 130, 35);
+
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(learning_mode), green);
+
+    button = gtk_button_new_with_label("Rouge");
+    gtk_fixed_put(GTK_FIXED(fixed), button, 680, 250);
+    gtk_widget_set_size_request(button, 80, 35);
+
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(init_red),capture);    
+
+    button = gtk_button_new_with_label("Vert");
+    gtk_fixed_put(GTK_FIXED(fixed), button, 680, 290);
+    gtk_widget_set_size_request(button, 80, 35);
+
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(init_green),capture);
+
+    button = gtk_button_new_with_label("Bleu");
+    gtk_fixed_put(GTK_FIXED(fixed), button, 680, 330);
+    gtk_widget_set_size_request(button, 80, 35);
+
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(init_blue),capture);
+
+
     //**********Start Programm *******
     gtk_widget_show_all(MainWindow);
     gtk_main();//begin infinite loop
