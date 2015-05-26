@@ -5,6 +5,7 @@
 //#include <opencv/cv.h>
 #include "struct.h"
 
+
 #define VECT_LEN 100
 #define MIN_VIT 1000000
 #define MAX_VIT 10000000
@@ -169,7 +170,8 @@ void print_Mvt(Mvt mvt) {
 }
 
 void print_vect(Mvt vect) {
-	for(int i = 0; i < VECT_LEN;i++) {
+	for(int i = 0; i < VECT_LEN;i++) 
+	{
 		printf("%2d : ",i);
 		print_Mvt(&vect[i]);
 	}
