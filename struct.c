@@ -102,14 +102,14 @@ void set_color2(ColorRGB* c,int r, int g, int b) {
 }
 
 Point new_point(int x, int y, int r, int g, int b) {
-	Point myPoint = malloc(sizeof(struct s_Point));
+	Point myPoint = (Point)malloc(sizeof(struct s_Point));
 	myPoint->x = x;
 	myPoint->y = y;
 	myPoint->color = new_color(r,g,b);
 	return myPoint;
 }
 void new_point1(Point p, int x, int y, int r, int g, int b) {
-        Point myPoint = malloc(sizeof(struct s_Point));
+        Point myPoint = (Point)malloc(sizeof(struct s_Point));
         myPoint->x = x;
         myPoint->y = y;
         myPoint->color = new_color(r,g,b);
@@ -129,7 +129,7 @@ void printp(Point p) {
 }
 
 Mvt new_vect() {
-	Mvt new_vect = malloc(VECT_LEN*sizeof(struct s_Mvt));
+	Mvt new_vect = (Mvt)malloc(VECT_LEN*sizeof(struct s_Mvt));
 	for(int i = 0; i < VECT_LEN; i++) {
 		new_vect[i].t = 0;
 		new_vect[i].v = 0;
@@ -138,14 +138,14 @@ Mvt new_vect() {
 	return new_vect;
 }
 
-void set_Mvt(Mvt new, Mvt pred,Point pt) {
-	new->t = clock();
+void set_Mvt(Mvt newM, Mvt pred,Point pt) {
+	newM->t = clock();
 	double dy2 = pow((double)(pred->p->y - pt->y),2);
 	double dx2 = pow((double)(pred->p->x - pt->x),2); 
 	double dist = sqrt(dx2+dy2);
-	new->v = dist / ((double)(new->t - pred->t)/CLOCKS_PER_SEC);
+	newM->v = dist / ((double)(newM->t - pred->t)/CLOCKS_PER_SEC);
 	printf("dx2= %lf - dy2= %lf - dist= %f\n",dx2,dy2,dist);
-	*new->p = *pt;
+	*newM->p = *pt;
 }
 
 
@@ -193,7 +193,7 @@ linked_List *emptyList()
 
 void addFirst(linked_List *list, Point p)
 {
-	Element *elt = malloc(sizeof(Element));
+	Element *elt = (Element*)malloc(sizeof(Element));
 	if(list == NULL || elt == NULL)
 		exit(EXIT_FAILURE);
 	elt->point = p;
@@ -214,7 +214,7 @@ void addFirst(linked_List *list, Point p)
 
 void addLast(linked_List *list, Point p)
 {
-	Element *elt = malloc(sizeof(Element));
+	Element *elt = (Element*)malloc(sizeof(Element));
 	if(list == NULL || elt == NULL)
 		exit(EXIT_FAILURE);
 	elt->point = p;
@@ -275,7 +275,7 @@ void addIndex(linked_List *list, int index, Point p)
 	
 	Element *elt = getIndex(list, index-1);
 	
-	Element *tmp = malloc(sizeof(Element));
+	Element *tmp = (Element*)malloc(sizeof(Element));
 	tmp->point = p;
 	tmp->prev = elt;
 	tmp->next = elt->next;	
