@@ -28,6 +28,13 @@ int learningMode = 0;	// if 0: recognizing mode, else learning mode.
 int recordingMvt = 0;	// 1 while recording.
 linked_List *redList, *greenList, *blueList;	//list of point for each finger conatining a movement.
 
+void setHSV (int sh, int ss, int sv, int c) {
+
+    h[c] = sh;
+    v[c] = sv;
+    s[c] = ss;
+}
+
 IplImage *image2;
 
 int xr=0,yr=0,xb=0,yb=0,xv=0,yv=0;
@@ -226,7 +233,7 @@ CvPoint binarisation(IplImage* image, IplImage* hsv, int *nbPixels, int cint)
 	}
 
 
-	cvShowImage("Mask", mask);
+	//cvShowImage("Mask", mask);
 
 	//free tout 
 	cvReleaseStructuringElement(&kernel);
@@ -278,7 +285,7 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels, int 
 	//Dessine moi un mouton	
 	if (nbPixels > 10)
 		cvDrawCircle(image, objectPos[cint], 5, CV_RGB(255, 0, 0), -1);
-	cvShowImage("Color Tracking", image);
+	//cvShowImage("Color Tracking", image);
 }
 
 
@@ -306,36 +313,36 @@ void getObjectColor(int event, int x, int y, int flags, void *param)
 }
 
 
-int traitement(){
+IplImage * traitement(CvCapture * capture){
 	//Point p;s2
 	//p = new_point(0,0,0,0,0);
 	char key;
 	IplImage *hsv;
 	int nbPixels[3];
 	CvPoint oNPR,oNPG, oNPB ; //objectNextPos
-	CvCapture *capture = cvCreateCameraCapture( CV_CAP_ANY );  //capte image caméra
+	//CvCapture *capture = cvCreateCameraCapture( CV_CAP_ANY );  //capte image caméra
 	if (!capture) {
 		printf("Ouverture du flux vidéo impossible !\n");
 	}else{ 
 		//fait les fenêtre
 
-		cvNamedWindow("Color Tracking", CV_WINDOW_AUTOSIZE);
-		cvNamedWindow("Mask", CV_WINDOW_AUTOSIZE);
-		cvMoveWindow("Color Tracking", 0, 100);
-		cvMoveWindow("Mask", 650, 100);
+	//	cvNamedWindow("Color Tracking", CV_WINDOW_AUTOSIZE);
+	//	cvNamedWindow("Mask", CV_WINDOW_AUTOSIZE);
+	//	cvMoveWindow("Color Tracking", 0, 100);
+	//	cvMoveWindow("Mask", 650, 100);
 
 		// clique souris
-		cvSetMouseCallback("Color Tracking", getObjectColor);
+	//	cvSetMouseCallback("Color Tracking", getObjectColor);
 		int a = 0;
 		//int fd = connect_mouse("/dev/input/event12");
-		while(key != 'q' && key != 'Q') {
+	//	while(key != 'q' && key != 'Q') {
 			image2  = cvQueryFrame(capture);
-			if(key == 'r')
+	/*		if(key == 'r')
 				cint = 0;
 			if(key == 'g')
 				cint = 1;
 			if(key == 'b')
-				cint = 2;
+				cint = 2;*/
 			hsv = RGBtoHSV(image2);
 			oNPR = binarisation(image2, hsv, &nbPixels[0], 0);
 			oNPG = binarisation(image2, hsv, &nbPixels[1], 1);
@@ -344,19 +351,19 @@ int traitement(){
 			if( key == 's') 
 			{ fd = connect_mouse("/dev/input/event14"); a = 1;}
 			else
-			addObjectToVideo(image2, oNPR, nbPixels[0], fd, a, 0);
+	        	addObjectToVideo(image2, oNPR, nbPixels[0], fd, a, 0);
 			addObjectToVideo(image2, oNPG, nbPixels[1], fd, a, 1);
 			addObjectToVideo(image2, oNPB, nbPixels[2], fd, a, 2);
 			//affiche et attend entré clavier pendant 10ms
-			key = cvWaitKey(10);
+	//		key = cvWaitKey(10);
 			
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// FIN BOUCLE PRINCIPALE, POINTS MIS A JOUR ICI
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
-			printf("point : (%d,%d)\n", objectPos[1].x, objectPos[1].y); 
+//			printf("point : (%d,%d)\n", objectPos[1].x, objectPos[1].y); 
 			
-			if(key == 'x' || key == 'X')		// switch between learning and reco modes and stops recording.
+	/*		if(key == 'x' || key == 'X')		// switch between learning and reco modes and stops recording.
 			{
 				recordingMvt = 0;
 				if(learningMode)
@@ -408,20 +415,20 @@ int traitement(){
 					printf("Recording in learning mode.\n");
 				}
 			}
+	*/		
 			
-			
-		}
+		
 		close(fd);
 		//free tout
-		printf("\nimage de taille : %dx%d\n", image2->width, image2->height);
+//		printf("\nimage de taille : %dx%d\n", image2->width, image2->height);
 
-		cvDestroyAllWindows();
-		cvDestroyWindow("Color Tracking");
-		cvDestroyWindow("Mask");
-		cvReleaseCapture(&capture);
-		printf("Merci d'avoir utilisé notre logiciel de capture d'image.\n");
+	//	cvDestroyAllWindows();
+	//	cvDestroyWindow("Color Tracking");
+	//	cvDestroyWindow("Mask");
+	//	cvReleaseCapture(&capture);
+    //		printf("Merci d'avoir utilisé notre logiciel de capture d'image.\n");
 	}
-	return 0;
+	return image2;
 }
 
 
