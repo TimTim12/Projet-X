@@ -24,5 +24,6 @@ double distance_at_angle(linked_List* points, Template* t, double teta);
 int recognize(linked_List* points, Template** templates, double* score);
 linked_List* format(linked_List* points);
 void printMatch(linked_List* points, Template** templates);
+char* getMatch(linked_List* points, Template** templates);
 
 #endif

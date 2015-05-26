@@ -13,14 +13,48 @@ GtkWidget* red = NULL;
 GtkWidget* green = NULL;
 GtkWidget* red_c = NULL;
 IplImage *image_cam = NULL;
-int learning = 0;
+
+
+int learning = 0, recording = 0;
+GdkEventKey *event_key;
+char figure_name[128];
+
+
 int xa = 20;
 int init = 1;
 int red_init = 0;
 int green_init = 0;
 int blue_init = 0;
-GdkEventKey *event_key;
-char * figure_name = "";
+
+int getRecording()
+{
+	return recording;
+}
+void setRecording(int i)
+{
+	recording = i;
+}
+int getLearning()
+{
+	return learning;
+}
+void setLearning(int i)
+{
+	learning = i;
+}
+char* getFigureName()
+{
+	return figure_name;
+}
+void setFigureName(char* name)
+{
+	sprintf(figure_name, "%s", name);
+}
+
+
+
+
+
 GtkWidget* convertOpenCv2Gtk (IplImage* srcImage)
 {
     GtkWidget* gtkImg = NULL;
@@ -139,17 +173,21 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, CvCaptu
     return TRUE;
 
 }
+
 gboolean record_name(GtkWidget *widget, GdkEventExpose *event,GtkEntry *text){
     
-    figure_name = (char*)gtk_entry_get_text(text);
+    //figure_name = (char*)gtk_entry_get_text(text);
+	setFigureName((char*)gtk_entry_get_text(text));
+	printf("%s\n",getFigureName());
     return TRUE;
 }
+
 gboolean learning_mode(GtkWidget *widget, GdkEventExpose *event, GtkLabel *label) {
         if (!learning){
 
                 GtkWidget *name;
                 gtk_label_set_text(label,"Mode Apprentissage");
-                learning = 0;
+                learning = 1;
 
                 GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
                 GtkWidget *button = gtk_button_new_from_stock (GTK_STOCK_ADD);
@@ -187,10 +225,11 @@ gboolean learning_mode(GtkWidget *widget, GdkEventExpose *event, GtkLabel *label
                 gtk_widget_show_all (window);
         }else{
                 gtk_label_set_text(label,"");
-                learning = 1;
+                learning = 0;
         }       
         return TRUE;
 }
+
 gboolean init_red(GtkWidget *widget, GdkEventExpose *event, CvCapture *captur) {
        red_init = 1;
        green_init = blue_init = 0;
@@ -198,6 +237,7 @@ gboolean init_red(GtkWidget *widget, GdkEventExpose *event, CvCapture *captur) {
        // traitement();
         return TRUE;
 }
+
 gboolean init_green(GtkWidget *widget, GdkEventExpose *event, CvCapture *captur) {
        green_init = 1;
        red_init = blue_init = 0;
@@ -205,6 +245,7 @@ gboolean init_green(GtkWidget *widget, GdkEventExpose *event, CvCapture *captur)
        // traitement();
         return TRUE;
 }
+
 gboolean init_blue(GtkWidget *widget, GdkEventExpose *event, CvCapture *captur) {
        blue_init = 1;
        red_init = green_init = 0;
@@ -258,6 +299,8 @@ button_press_callback (GtkWidget      *event_box,
     red_init = green_init = blue_init = 0;
     return TRUE;
 }
+
+
 gboolean
 on_key_press (GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {

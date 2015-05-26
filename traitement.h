@@ -3,6 +3,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
+#include "lib_gtk.h"
 #include "struct.h"
 #ifndef _TRAITEMENT_H
 #define _TRAITEMENT_H

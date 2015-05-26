@@ -5,7 +5,12 @@
 #include <gtk/gtk.h>
 #include "struct.h"
 
-
+char* getFigureName();
+void setFigureName(char* name);
+void setLearning(int i);
+int getLearning();
+void setRecording(int i);
+int getRecording();
 GtkWidget* convertOpenCv2Gtk (IplImage* srcImage);
 
 gboolean callback(gpointer data);

@@ -27,8 +27,9 @@ CvPoint objectPos[3] = {cvPoint(-1, -1), cvPoint(-1,-1), cvPoint(-1,-1)};
 int h[3] = {0,0,0}, s[3] = {0,0,0}, v[3] = {0,0,0};
 int tolerance = 10, fd, cint = 0;
 
-int learningMode = 0;	// if 0: recognizing mode, else learning mode.
-int recordingMvt = 0;	// 1 while recording.
+//int learningMode = 0;	// if 0: recognizing mode, else learning mode.
+//int recordingMvt = 0;	// 1 while recording.
+
 linked_List *redList, *greenList, *blueList;	//list of point for each finger conatining a movement.
 Template** templates; // saved templates
 pthread_t formatThread, recoThread;
@@ -322,7 +323,8 @@ void getObjectColor(int event, int x, int y, int flags, void *param)
 // recognize the movement
 void *thread_Format_Reco(void* arg)
 {
-	printMatch(format(redList), templates);
+	//printMatch(format(redList), templates);
+	printf("%s\n", getMatch(format(redList), templates));
 	
 	(void*) arg;		// avoids warning unused arg
 	
@@ -333,7 +335,8 @@ void *thread_Format_Reco(void* arg)
 void *thread_Format_Save(void* arg)
 {
 	printf("Saving pattern...\n");
-	saveTemplate(format(redList), "Left", templates);
+	saveTemplate(format(redList), getFigureName(), templates);
+	printf("%s\n",getFigureName());
 	printf("Check succesfully saved !\n");
 	
 	(void*) arg;		// avoids warning unused arg
@@ -391,7 +394,7 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
 			
-			if(key != NULL && key->keyval == GDK_p || key->keyval == GDK_P)
+			if(key != NULL && (key->keyval == GDK_p || key->keyval == GDK_P))
 			{
 				int i = 0;
 				while(templates[i] != NULL)
@@ -402,58 +405,58 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 				}
 			}
 			
-			if(key != NULL && key->keyval == GDK_x || key->keyval == GDK_X)		// switch between learning and reco modes and stops recording.
+			if(key != NULL && (key->keyval == GDK_x || key->keyval == GDK_X))		// switch between learning and reco modes and stops recording.
 			{
-				recordingMvt = 0;
-				if(learningMode)
-					learningMode = 0;
+				setRecording(0);
+				if(getLearning())
+					setLearning(0);
 				else
-					learningMode = 1;
-				printf("Learning mode is now %s !\n", learningMode ? "On" : "Off");
+					setLearning(1);
+				printf("Learning mode is now %s !\n", getLearning() ? "On" : "Off");
 			}
 			
-			if(!learningMode)		// reconaissance
+			if(!getLearning())		// reconaissance
 			{
-				if(key != NULL && key->keyval == GDK_v || key->keyval == GDK_V)
+				if(key != NULL && (key->keyval == GDK_v || key->keyval == GDK_V))
 				{
-					if(!recordingMvt)		//not recording
+					if(!getRecording())		//not recording
 					{
-						recordingMvt = 1;
+						setRecording(1);
 						redList = emptyList();
 						//blueList = emptyList();
 						//greenList = emptyList();
 					}
 					else
 					{
-						recordingMvt = 0;
+						setRecording(0);
 						printList(redList);
 						pthread_create(&recoThread, NULL, thread_Format_Reco, NULL);
 					}
 				}
-				if(recordingMvt)
+				if(getRecording())
 				{
 					addLast(redList, new_point(objectPos[0].x, objectPos[0].y, 0, 0, 0));
 				}
 			}
 			else					// apprentissage
 			{
-				if(key != NULL && key->keyval == GDK_v || key->keyval == GDK_V)
+				if(key != NULL && (key->keyval == GDK_v || key->keyval == GDK_V))
 				{
-					if(!recordingMvt)
+					if(!getRecording())
 					{
-						recordingMvt = 1;
+						setRecording(1);
 						redList = emptyList();
 						//blueList = emptyList();
 						//greenList = emptyList();
 					}
 					else
 					{
-						recordingMvt = 0;
+						setRecording(0);
 						printList(redList);
 						pthread_create(&formatThread, NULL, thread_Format_Save, NULL);
 					}
 				}
-				if(recordingMvt)
+				if(getRecording())
 				{
 					addLast(redList, new_point(objectPos[0].x, objectPos[0].y, 0, 0, 0));
 				}

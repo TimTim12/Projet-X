@@ -394,6 +394,18 @@ void printMatch(linked_List* points, Template** templates)
 		printf("Pattern didn't match with any known form.\n");
 }
 
+char* getMatch(linked_List* points, Template** templates)
+{
+	double score;
+	int result = recognize(points, templates, &score);
+	char str[256];
+	if(result != -1)
+		sprintf(str,"match with %s with %lf percent\n",templates[result]->name ,score);		// print index recognized
+	else
+		sprintf(str,"Pattern didn't match with any known form.\n");
+	return str;
+}
+
 
 
 
