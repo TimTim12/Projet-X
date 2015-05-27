@@ -176,18 +176,24 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, CvCaptu
 
 gboolean record_name(GtkWidget *widget, GdkEventExpose *event,GtkEntry *text){
     
-    //figure_name = (char*)gtk_entry_get_text(text);
+    char learning_name[128] = "\0";
+    char *fig = (char*)gtk_entry_get_text(text);
+    char *learn = "Apprentissage de ";
+    strcat(learning_name,learn);
+    strcat(learning_name, fig);
+        gtk_label_set_text(GTK_LABEL(green), learning_name);
 	setFigureName((char*)gtk_entry_get_text(text));
 	printf("%s\n",getFigureName());
     return TRUE;
 }
 
-gboolean learning_mode(GtkWidget *widget, GdkEventExpose *event, GtkLabel *label) {
+gboolean learning_mode(GtkButton *widget, GdkEventExpose *event, GtkLabel *label) {
         if (!learning){
 
                 GtkWidget *name;
                 gtk_label_set_text(label,"Mode Apprentissage");
                 learning = 1;
+                gtk_button_set_label(widget,"ENREGISTREMENT"); 
 
                 GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
                 GtkWidget *button = gtk_button_new_from_stock (GTK_STOCK_ADD);
@@ -224,8 +230,10 @@ gboolean learning_mode(GtkWidget *widget, GdkEventExpose *event, GtkLabel *label
                         
                 gtk_widget_show_all (window);
         }else{
+                 gtk_label_set_text(GTK_LABEL(green), "");
                 gtk_label_set_text(label,"");
                 learning = 0;
+                 gtk_button_set_label(widget,"APPRENDRE"); 
         }       
         return TRUE;
 }
@@ -368,7 +376,7 @@ int init_gtk(int argc, char **argv){
 
     button = gtk_button_new_with_label("APPRENDRE");
     gtk_fixed_put(GTK_FIXED(fixed), button, 30, 50);
-    gtk_widget_set_size_request(button, 130, 35);
+    gtk_widget_set_size_request(button, 140, 35);
 
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(learning_mode), green);
 
