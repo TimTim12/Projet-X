@@ -240,8 +240,8 @@ linked_List *rotate_by(linked_List *points, double w)
 linked_List *scale_to(linked_List *points)
 {
 	//bounded box
-	int minX = INT_MAX;
-	int minY = INT_MAX;
+	int minX = int_max;
+	int minY = int_max;
 	int maxX = 0;
 	int maxY = 0;
 	for(int i = 0; i < points->count; i++)
@@ -330,12 +330,12 @@ double distance_at_angle(linked_List* points, Template* t, double teta)
 // return number of the template matched in templates[] or -1 if theshold not reached
 int recognize(linked_List* points, Template** templates, double* score)
 {
-	double b = INT_MAX;
+	double b = int_max;
 	int i = 0, r =-1;
 	while(templates[i] != NULL)
 	{
 		double d = 0; //distance_at_best_angle(points, templates[i], -45, +45, 2);
-		for(int j = 0; j < MIN(points->count,templates[i]->points->count); j++)			//use of min to bypass the resample bug
+		for(int j = 0; j < min2(points->count,templates[i]->points->count); j++)			//use of min to bypass the resample bug
 		{
 			d += distance(getIndex(points, j)->point, getIndex(templates[i]->points, j)->point);
 		}
