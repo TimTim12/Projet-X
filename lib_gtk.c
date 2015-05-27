@@ -88,12 +88,16 @@ GtkWidget* convertOpenCv2Gtk (IplImage* srcImage)
 }
 GdkPixbuf* convertOpenCv2Gtkp (IplImage* srcImage)
 {
-    GtkWidget* gtkImg = NULL;
-    GdkPixbuf* gtkPixbuf = NULL;
-    IplImage* dstImage = NULL;
-
+    static GtkWidget* gtkImg = NULL;
+    static GdkPixbuf* gtkPixbuf = NULL;
+    static IplImage* dstImage = NULL;
+		IplImage* lastImage;
+		
     /** Creating the destionation image */
+		lastImage = dstImage;
     dstImage = cvCreateImage( cvSize(srcImage->width,srcImage->height), IPL_DEPTH_8U, 3);
+		if (lastImage != NULL)
+			cvReleaseImage(&lastImage);
 
     /** Converting the format of the picture from BGR to RGB */
     cvCvtColor ( srcImage, dstImage, CV_BGR2RGB );
@@ -149,7 +153,7 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, CvCaptu
    if(init){
 
       gtk_widget_queue_draw( GTK_WIDGET( widget ));
-      image_cam= traitement(cap,event_key); //cvQueryFrame(cap);
+      image_cam = traitement(cap,event_key); //cvQueryFrame(cap);
       event_key = NULL;
 //	  for_gtk(image_cam);
       //filtre_forme(image_cam);
