@@ -1,7 +1,7 @@
 #Makefile with basic concepts
 
 # Define compiler and options
-CC=g++
+CC=g++ -w -g
 CFLAGS= `pkg-config --cflags opencv gtk+-2.0`
 LDFLAGS+=`pkg-config --libs opencv gtk+-2.0`
 
@@ -12,7 +12,7 @@ LDFLAGS+=`pkg-config --libs opencv gtk+-2.0`
 all: projetX
 
 projetX: struct.o dollar1.o mouse.o lib_gtk.o traitement.o projetX.o
-	$(CC) $^ -g -o $@ $(LDFLAGS) -lpthread -lm 
+	$(CC) $^ -o $@ $(LDFLAGS) -lpthread -lm
 
 clean::
 	rm -f *~ *.o

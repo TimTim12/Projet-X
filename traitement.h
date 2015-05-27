@@ -3,6 +3,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
+
 #include "lib_gtk.h"
 #include "struct.h"
 #ifndef _TRAITEMENT_H
@@ -15,7 +16,15 @@ int get_yb();
 int get_xv();
 int get_yv();
 
+void setRecoRed(char* str);
+char* getRecoRed();
+void setRecoGreen(char* str);
+char* getRecoGreen();
+void setRecoBlue(char* str);
+char* getRecoBlue();
+
 char * get_pattern_reco();
+
 IplImage* RGBtoHSV(const IplImage *imageRGB);
 void setHSV(int h, int s, int v, int c);
 void set_color(IplImage *image, unsigned char* data);

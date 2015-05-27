@@ -267,7 +267,7 @@ linked_List *scale_to(linked_List *points)
 	for(int i = 0; i < points->count; i++)
 	{
 		Point tmp = getIndex(points, i)->point;
-		addLast(newPoints, new_point(tmp->x * SIZE / width, tmp->y * SIZE / height, 0, 0, 0));
+		addLast(newPoints, new_point(width > 0 ? (tmp->x * SIZE / width) : SIZE, height > 0 ? (tmp->y * SIZE / height) : SIZE, 0, 0, 0));
 	}
 	return newPoints;
 }
@@ -389,17 +389,39 @@ linked_List* format(linked_List* points)
 }
 
 
-void printMatch(linked_List* points, Template** templates, int diffX, int diffY)
+void printMatch(linked_List* points, Template** templates, int diffX, int diffY, int color)
 {
 	if(points == NULL)
 	{
-		printf("Empty List.\n");
-		return;
+		//printf("Empty List.\n");
+		switch(color)
+		{
+			case 0: 
+				setRecoRed("Empty List.\n");
+				return;
+			case 1: 
+				setRecoGreen("Empty List.\n");
+				return;
+			default: 
+				setRecoBlue("Empty List.\n");
+				return;
+		}
 	}
 	if(!points->count)
 	{
-		printf("Pattern didn't match with any known form.\n");
-		return;
+		//printf("Pattern didn't match with any known form.\n");
+		switch(color)
+		{
+			case 0: 
+				setRecoRed("Pattern didn't match with any known form.\n");
+				return;
+			case 1: 
+				setRecoGreen("Pattern didn't match with any known form.\n");
+				return;
+			default: 
+				setRecoBlue("Pattern didn't match with any known form.\n");
+				return;
+		}
 	}
 	
 	double score;
@@ -408,31 +430,111 @@ void printMatch(linked_List* points, Template** templates, int diffX, int diffY)
 	{
 		if(!strcmp(templates[result]->name,"line"))
 		{
-			int diffX = points->last->point->x - points->first->point->x;
-			int diffY = points->last->point->y - points->first->point->y;
 			if(fabs((double)diffX) > fabs((double)diffY))
 			{
 				
-				if(diffX > 0)
-					printf("match with right with %lf percent\n",score);
+				if(diffX < 0)
+				{
+					switch(color)
+					{
+						case 0: 
+							setRecoRed("right");
+							return;
+						case 1: 
+							setRecoGreen("right");
+							return;
+						default: 
+							setRecoBlue("right");
+							return;
+					}
+ 					//printf("match with right with %lf percent\n",score);
+				}
 				else
-					printf("match with left with %lf percent\n",score);
+				{
+					switch(color)
+					{
+						case 0: 
+							setRecoRed("left");
+							return;
+						case 1: 
+							setRecoGreen("left");
+							return;
+						default: 
+							setRecoBlue("left");
+							return;
+					}
+					//printf("match with left with %lf percent\n",score);
+				}
 			}
 			else
 			{
 				if(diffY > 0)
-					printf("match with down with %lf percent\n",score);
+				{
+					switch(color)
+					{
+						case 0: 
+							setRecoRed("down");
+							return;
+						case 1: 
+							setRecoGreen("down");
+							return;
+						default: 
+							setRecoBlue("down");
+							return;
+					}
+					//printf("match with down with %lf percent\n",score);
+				}
 				else
-					printf("match with up with %lf percent\n",score);
+				{
+					switch(color)
+					{
+						case 0: 
+							setRecoRed("up");
+							return;
+						case 1: 
+							setRecoGreen("up");
+							return;
+						default: 
+							setRecoBlue("up");
+							return;
+					}
+					//printf("match with up with %lf percent\n",score);
+				}
 			}
 		}
 		else
 		{
-			printf("match with %s with %lf percent\n",templates[result]->name ,score);		// print index recognized
+			switch(color)
+			{
+				case 0: 
+					setRecoRed(templates[result]->name);
+					return;
+				case 1: 
+					setRecoGreen(templates[result]->name);
+					return;
+				default: 
+					setRecoBlue(templates[result]->name);
+					return;
+			}
+			//printf("match with %s with %lf percent\n",templates[result]->name ,score);		// print index recognized
 		}
 	}
 	else
-		printf("Pattern didn't match with any known form.\n");
+	{
+		switch(color)
+		{
+			case 0: 
+				setRecoRed("Pattern didn't match with any known form.\n");
+				return;
+			case 1: 
+				setRecoRed("Pattern didn't match with any known form.\n");
+				return;
+			default: 
+				setRecoRed("Pattern didn't match with any known form.\n");
+				return;
+		}
+		//printf("Pattern didn't match with any known form.\n");
+	}
 }
 
 

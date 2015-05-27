@@ -38,9 +38,42 @@ int templatesLoaded = 0;
 
 char pattern_reco[256];
 
+
+
+char recoRed[128], recoGreen[128], recoBlue[128];
+
+void setRecoRed(char* str)
+{
+	strcpy(recoRed,str);
+}
+char* getRecoRed()
+{
+	return recoRed;
+}
+void setRecoGreen(char* str)
+{
+	strcpy(recoGreen,str);
+}
+char* getRecoGreen()
+{
+	return recoGreen;
+}
+void setRecoBlue(char* str)
+{
+	strcpy(recoBlue,str);
+}
+char* getRecoBlue()
+{
+	return recoBlue;
+}
+
 char *get_pattern_reco(){
     return pattern_reco;
 }
+
+
+
+
 
 void setHSV (int sh, int ss, int sv, int c) {
 
@@ -331,11 +364,18 @@ void getObjectColor(int event, int x, int y, int flags, void *param)
 void *thread_Format_Reco(void* arg)
 {
 	//printMatch(format(redList), templates);
-    strcpy(pattern_reco,getMatch(format(redList), templates, redList->last->point->x - redList->first->point->x, redList->last->point->y - redList->first->point->y));
+    //strcpy(pattern_reco,getMatch(format(redList), templates, redList->last->point->x - redList->first->point->x, redList->last->point->y - redList->first->point->y));
 	
-	update_reco_label();
+	printMatch(format(redList), templates, redList->last->point->x - redList->first->point->x, redList->last->point->y - redList->first->point->y,0);
+	printMatch(format(greenList), templates, greenList->last->point->x - greenList->first->point->x, greenList->last->point->y - greenList->first->point->y,1);
+	printMatch(format(blueList), templates, blueList->last->point->x - blueList->first->point->x, blueList->last->point->y - blueList->first->point->y,2);
+	
+	//update_reco_label();
+	printf("red : %s\ngreen : %s\nblue : %s\n", getRecoRed(), getRecoGreen(), getRecoBlue());
 	
 	freeList(redList);
+	freeList(greenList);
+	freeList(blueList);
 	
 	(void*) arg;		// avoids warning unused arg
 	
@@ -440,8 +480,8 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 					{
 						setRecording(1);
 						redList = emptyList();
-						//blueList = emptyList();
-						//greenList = emptyList();
+						blueList = emptyList();
+						greenList = emptyList();
 					}
 					else
 					{
@@ -456,6 +496,10 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 				{
 					if(objectPos[0].x != -1 && objectPos[0].y != -1)
 						addLast(redList, new_point(objectPos[0].x, objectPos[0].y, 0, 0, 0));
+					if(objectPos[1].x != -1 && objectPos[1].y != -1)
+						addLast(greenList, new_point(objectPos[1].x, objectPos[1].y, 0, 0, 0));
+					if(objectPos[2].x != -1 && objectPos[2].y != -1)
+						addLast(blueList, new_point(objectPos[2].x, objectPos[2].y, 0, 0, 0));
 				}
 			}
 			else					// apprentissage

@@ -2,6 +2,8 @@
 #define _DOLLAR1
 
 #include "struct.h"
+#include "traitement.h"
+#include <string.h>
 
 #define int_max 32767
 #define SIZE 1000
@@ -23,7 +25,7 @@ linked_List* translate_to(linked_List* points, Point k);
 double distance_at_angle(linked_List* points, Template* t, double teta);
 int recognize(linked_List* points, Template** templates, double* score);
 linked_List* format(linked_List* points);
-void printMatch(linked_List* points, Template** templates, int diffX, int diffY);
+void printMatch(linked_List* points, Template** templates, int diffX, int diffY, int color);
 char* getMatch(linked_List* points, Template** templates, int diffX, int diffY);
 
 #endif
