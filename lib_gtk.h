@@ -12,6 +12,7 @@ int getLearning();
 void setRecording(int i);
 int getRecording();
 GtkWidget* convertOpenCv2Gtk (IplImage* srcImage);
+void update_reco_label();
 
 gboolean callback(gpointer data);
 

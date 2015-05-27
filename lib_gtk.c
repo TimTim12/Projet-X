@@ -55,18 +55,16 @@ void setFigureName(char* name)
 
 
 
+
 GtkWidget* convertOpenCv2Gtk (IplImage* srcImage)
 {
     GtkWidget* gtkImg = NULL;
     GdkPixbuf* gtkPixbuf = NULL;
     IplImage* dstImage = NULL;
-		IplImage* lastImage;
-		
+
     /** Creating the destionation image */
-		lastImage = dstImage;
     dstImage = cvCreateImage( cvSize(srcImage->width,srcImage->height), IPL_DEPTH_8U, 3);
-		if (lastImage != NULL)
-			cvReleaseImage(&lastImage);
+
     /** Converting the format of the picture from BGR to RGB */
     cvCvtColor ( srcImage, dstImage, CV_BGR2RGB );
 
@@ -88,16 +86,12 @@ GtkWidget* convertOpenCv2Gtk (IplImage* srcImage)
 }
 GdkPixbuf* convertOpenCv2Gtkp (IplImage* srcImage)
 {
-    static GtkWidget* gtkImg = NULL;
-    static GdkPixbuf* gtkPixbuf = NULL;
-    static IplImage* dstImage = NULL;
-		IplImage* lastImage;
-		
+    GtkWidget* gtkImg = NULL;
+    GdkPixbuf* gtkPixbuf = NULL;
+    IplImage* dstImage = NULL;
+
     /** Creating the destionation image */
-		lastImage = dstImage;
     dstImage = cvCreateImage( cvSize(srcImage->width,srcImage->height), IPL_DEPTH_8U, 3);
-		if (lastImage != NULL)
-			cvReleaseImage(&lastImage);
 
     /** Converting the format of the picture from BGR to RGB */
     cvCvtColor ( srcImage, dstImage, CV_BGR2RGB );
@@ -152,8 +146,8 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, CvCaptu
 {
    if(init){
 
-      gtk_widget_queue_draw( GTK_WIDGET( widget ));
-      image_cam = traitement(cap,event_key); //cvQueryFrame(cap);
+      gtk_widget_queue_draw(GTK_WIDGET(widget));
+      image_cam= traitement(cap,event_key); //cvQueryFrame(cap);
       event_key = NULL;
 //	  for_gtk(image_cam);
       //filtre_forme(image_cam);
@@ -201,7 +195,7 @@ gboolean learning_mode(GtkButton *widget, GdkEventExpose *event, GtkLabel *label
                 GtkWidget *name;
                 gtk_label_set_text(label,"Mode Apprentissage");
                 learning = 1;
-                gtk_button_set_label(widget,"ENREGISTREMENT"); 
+                gtk_button_set_label(widget,"RECONNAISSANCE"); 
 
                 GtkWidget *window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
                 GtkWidget *button = gtk_button_new_from_stock (GTK_STOCK_ADD);
@@ -318,16 +312,29 @@ button_press_callback (GtkWidget      *event_box,
 }
 
 
+void update_reco_label()
+{
+	 //if(event_key != NULL && event_key->keyval == GDK_v && !learning && getRecording())
+	 //{
+		if(get_pattern_reco() != NULL)
+			printf("%s\n", get_pattern_reco());
+		else
+			printf("Its NULL !\n");
+		gchar* sUtf8 = g_locale_to_utf8(get_pattern_reco(), -1, NULL, NULL, NULL);
+		gtk_label_set_text(GTK_LABEL(red),sUtf8);
+		g_free(sUtf8);
+		//gtk_widget_queue_draw(red);
+		gtk_widget_show_all(MainWindow);
+	//}          
+}
+
 gboolean
 on_key_press (GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
     event_key = event;
-    if(event_key->keyval == GDK_v && !learning){
-        gtk_label_set_text( GTK_LABEL(red),get_name_fig());
-    }          
     return FALSE;
-    
 }
+
 int init_gtk(int argc, char **argv){
     //***********Initialisation*************
     IplImage *image_cam;

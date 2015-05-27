@@ -34,10 +34,10 @@ linked_List *redList, *greenList, *blueList;	//list of point for each finger con
 Template** templates; // saved templates
 pthread_t formatThread, recoThread;
 
-char name_figure[50] = "";
+char pattern_reco[256];
 
-char *get_name_fig(){
-    return name_figure;
+char *get_pattern_reco(){
+    return pattern_reco;
 }
 
 void setHSV (int sh, int ss, int sv, int c) {
@@ -329,8 +329,14 @@ void getObjectColor(int event, int x, int y, int flags, void *param)
 void *thread_Format_Reco(void* arg)
 {
 	//printMatch(format(redList), templates);
-        strcpy(name_figure,getMatch(format(redList), templates));
-	printf("%s\n", getMatch(format(redList), templates));
+    strcpy(pattern_reco,getMatch(format(redList), templates));
+	
+	if(pattern_reco != NULL)
+		printf("->%s\n", pattern_reco);
+	else
+		printf("its null.\n");
+	
+	update_reco_label();
 	
 	(void*) arg;		// avoids warning unused arg
 	
@@ -342,8 +348,8 @@ void *thread_Format_Save(void* arg)
 {
 	printf("Saving pattern...\n");
 	saveTemplate(format(redList), getFigureName(), templates);
-	printf("%s\n",getFigureName());
-	printf("Check succesfully saved !\n");
+	//printf("%s\n",getFigureName());
+	printf("Pattern succesfully saved !\n");
 	
 	(void*) arg;		// avoids warning unused arg
 	
@@ -398,6 +404,7 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// FIN BOUCLE PRINCIPALE, POINTS MIS A JOUR ICI
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
 			
 			
 			if(key != NULL && (key->keyval == GDK_p || key->keyval == GDK_P))

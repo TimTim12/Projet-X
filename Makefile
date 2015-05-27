@@ -12,7 +12,7 @@ LDFLAGS+=`pkg-config --libs opencv gtk+-2.0`
 all: projetX
 
 projetX: struct.o dollar1.o mouse.o lib_gtk.o traitement.o projetX.o
-	$(CC) $^ -o $@ $(LDFLAGS) -lpthread -lm
+	$(CC) $^ -g -o $@ $(LDFLAGS) -lpthread -lm 
 
 clean::
 	rm -f *~ *.o

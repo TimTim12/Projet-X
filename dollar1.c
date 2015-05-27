@@ -269,6 +269,7 @@ linked_List *scale_to(linked_List *points)
 	return newPoints;
 }
 
+
 linked_List* translate_to(linked_List* points, Point k)
 {
 	Point c = centroid(points);
@@ -291,6 +292,7 @@ double distance_at_angle(linked_List* points, Template* t, double teta)
 {
 	return path_distance(rotate_by(points, M_PI*teta/180), t->points); //teta to radiant
 }
+
 
 /*double distance_at_best_angle(linked_List* points, Template* t, int Oa, int Ob, int Oc)     // FORGOTTEN FOR S2
 {
@@ -327,6 +329,7 @@ double distance_at_angle(linked_List* points, Template* t, double teta)
 	return f2;
 }*/
 
+
 // return number of the template matched in templates[] or -1 if theshold not reached
 int recognize(linked_List* points, Template** templates, double* score)
 {
@@ -341,7 +344,7 @@ int recognize(linked_List* points, Template** templates, double* score)
 		}
 		d = d/points->count;
 		
-		printf("Match with %s : %f percent\n", templates[i]->name, (1 - (d/(0.5*sqrt(SIZE*SIZE + SIZE*SIZE)))) * 100);
+		//printf("Match with %s : %f percent\n", templates[i]->name, (1 - (d/(0.5*sqrt(SIZE*SIZE + SIZE*SIZE)))) * 100);
 		
 		if(d<b)
 		{
@@ -381,9 +384,6 @@ linked_List* format(linked_List* points)
 }
 
 
-
-
-
 void printMatch(linked_List* points, Template** templates)
 {
 	double score;
@@ -394,6 +394,7 @@ void printMatch(linked_List* points, Template** templates)
 		printf("Pattern didn't match with any known form.\n");
 }
 
+
 char* getMatch(linked_List* points, Template** templates)
 {
 	double score;
@@ -403,6 +404,7 @@ char* getMatch(linked_List* points, Template** templates)
 		sprintf(str,"match with %s with %lf percent\n",templates[result]->name ,score);		// print index recognized
 	else
 		sprintf(str,"Pattern didn't match with any known form.\n");
+	
 	return str;
 }
 

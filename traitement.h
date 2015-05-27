@@ -15,7 +15,7 @@ int get_yb();
 int get_xv();
 int get_yv();
 
-char * get_name_fig();
+char * get_pattern_reco();
 IplImage* RGBtoHSV(const IplImage *imageRGB);
 void setHSV(int h, int s, int v, int c);
 void set_color(IplImage *image, unsigned char* data);
