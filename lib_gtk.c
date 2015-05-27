@@ -170,6 +170,7 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, CvCaptu
         capture = cvCreateCameraCapture(CV_CAP_ANY);
         return FALSE;
     }*/
+    //cvReleaseImage(&image_cam);
     return TRUE;
 
 }
@@ -305,6 +306,7 @@ button_press_callback (GtkWidget      *event_box,
  
                 cvReleaseImage(&hsv);
     red_init = green_init = blue_init = 0;
+     gtk_label_set_text( GTK_LABEL(green),"OK");
     return TRUE;
 }
 
@@ -313,7 +315,9 @@ gboolean
 on_key_press (GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
     event_key = event;
-       
+    if(event_key->keyval == GDK_v && !learning){
+        gtk_label_set_text( GTK_LABEL(red),get_name_fig());
+    }          
     return FALSE;
     
 }
