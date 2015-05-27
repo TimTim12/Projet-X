@@ -3,9 +3,9 @@
 
 #include "struct.h"
 
-#define INT_MAX 32767
+#define int_max 32767
 #define SIZE 1000
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define min2(x, y) (((x) < (y)) ? (x) : (y))
 
 char** tokenize(char* line, char* token, int sizeTab);
 void printTemplate(Template* t);
