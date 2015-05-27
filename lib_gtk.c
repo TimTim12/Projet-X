@@ -150,7 +150,7 @@ gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, CvCaptu
       event_key = NULL;
 //	  for_gtk(image_cam);
       //filtre_forme(image_cam);
-      image = convertOpenCv2Gtk(image_cam);
+      //image = convertOpenCv2Gtk(image_cam);
 
 
     gdk_draw_pixbuf( widget->window,

@@ -34,6 +34,11 @@ linked_List *redList, *greenList, *blueList;	//list of point for each finger con
 Template** templates; // saved templates
 pthread_t formatThread, recoThread;
 
+char name_figure[50] = "";
+
+char *get_name_fig(){
+    return name_figure;
+}
 
 void setHSV (int sh, int ss, int sv, int c) {
 
@@ -324,6 +329,7 @@ void getObjectColor(int event, int x, int y, int flags, void *param)
 void *thread_Format_Reco(void* arg)
 {
 	//printMatch(format(redList), templates);
+        strcpy(name_figure,getMatch(format(redList), templates));
 	printf("%s\n", getMatch(format(redList), templates));
 	
 	(void*) arg;		// avoids warning unused arg
