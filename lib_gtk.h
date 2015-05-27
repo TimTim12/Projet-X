@@ -6,6 +6,7 @@
 #include "struct.h"
 
 char* getFigureName();
+int getActiveColor();
 void setFigureName(char* name);
 void setLearning(int i);
 int getLearning();

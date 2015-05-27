@@ -65,6 +65,7 @@ void print_vect(Mvt vect);
 
 
 linked_List* emptyList();
+void freeList(linked_List* list);
 void addFirst(linked_List* list, Point p);
 void addLast(linked_List* list, Point p);
 Element* getIndex(linked_List* list, int index);

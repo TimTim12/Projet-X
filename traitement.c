@@ -34,6 +34,8 @@ linked_List *redList, *greenList, *blueList;	//list of point for each finger con
 Template** templates; // saved templates
 pthread_t formatThread, recoThread;
 
+int templatesLoaded = 0;
+
 char pattern_reco[256];
 
 char *get_pattern_reco(){
@@ -329,14 +331,11 @@ void getObjectColor(int event, int x, int y, int flags, void *param)
 void *thread_Format_Reco(void* arg)
 {
 	//printMatch(format(redList), templates);
-    strcpy(pattern_reco,getMatch(format(redList), templates));
-	
-	if(pattern_reco != NULL)
-		printf("->%s\n", pattern_reco);
-	else
-		printf("its null.\n");
+    strcpy(pattern_reco,getMatch(format(redList), templates, redList->last->point->x - redList->first->point->x, redList->last->point->y - redList->first->point->y));
 	
 	update_reco_label();
+	
+	freeList(redList);
 	
 	(void*) arg;		// avoids warning unused arg
 	
@@ -348,8 +347,9 @@ void *thread_Format_Save(void* arg)
 {
 	printf("Saving pattern...\n");
 	saveTemplate(format(redList), getFigureName(), templates);
-	//printf("%s\n",getFigureName());
 	printf("Pattern succesfully saved !\n");
+	
+	freeList(redList);
 	
 	(void*) arg;		// avoids warning unused arg
 	
@@ -359,7 +359,11 @@ void *thread_Format_Save(void* arg)
 
 IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 {	
-	templates = loadTemplates();
+	if(!templatesLoaded)
+	{
+		templatesLoaded = 1;
+		templates = loadTemplates();
+	}
 	
 	IplImage *hsv;
 	int nbPixels[3];
@@ -393,7 +397,7 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 			oNPB = binarisation(image2, hsv, &nbPixels[2], 2);
 			cvReleaseImage(&hsv);
 			if(key != NULL && key->keyval == GDK_s) 
-			{ fd = connect_mouse("/dev/input/event14"); a = 1;}
+			{ /*fd = connect_mouse("/dev/input/event14"); a = 1;*/}
 			else
 	        	addObjectToVideo(image2, oNPR, nbPixels[0], fd, a, 0);
 			addObjectToVideo(image2, oNPG, nbPixels[1], fd, a, 1);
@@ -418,7 +422,7 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 				}
 			}
 			
-			if(key != NULL && (key->keyval == GDK_x || key->keyval == GDK_X))		// switch between learning and reco modes and stops recording.
+			/*if(key != NULL && (key->keyval == GDK_x || key->keyval == GDK_X))		// switch between learning and reco modes and stops recording.
 			{
 				setRecording(0);
 				if(getLearning())
@@ -426,7 +430,7 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 				else
 					setLearning(1);
 				printf("Learning mode is now %s !\n", getLearning() ? "On" : "Off");
-			}
+			}*/
 			
 			if(!getLearning())		// reconaissance
 			{
@@ -442,13 +446,16 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 					else
 					{
 						setRecording(0);
-						printList(redList);
+						//printList(redList);
+						if(recoThread)
+							pthread_join(recoThread, NULL);
 						pthread_create(&recoThread, NULL, thread_Format_Reco, NULL);
 					}
 				}
 				if(getRecording())
 				{
-					addLast(redList, new_point(objectPos[0].x, objectPos[0].y, 0, 0, 0));
+					if(objectPos[0].x != -1 && objectPos[0].y != -1)
+						addLast(redList, new_point(objectPos[0].x, objectPos[0].y, 0, 0, 0));
 				}
 			}
 			else					// apprentissage
@@ -459,24 +466,25 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 					{
 						setRecording(1);
 						redList = emptyList();
-						//blueList = emptyList();
-						//greenList = emptyList();
 					}
 					else
 					{
 						setRecording(0);
 						printList(redList);
+						/*if(formatThread)
+							pthread_join(formatThread, NULL);*/
 						pthread_create(&formatThread, NULL, thread_Format_Save, NULL);
 					}
 				}
 				if(getRecording())
 				{
-					addLast(redList, new_point(objectPos[0].x, objectPos[0].y, 0, 0, 0));
+					if(objectPos[getActiveColor()].x != -1 && objectPos[getActiveColor()].y != -1)
+						addLast(redList, new_point(objectPos[getActiveColor()].x, objectPos[getActiveColor()].y, 0, 0, 0));
 				}
 			}		
 			
 		
-		close(fd);
+		//close(fd);
 		//free tout
 //		printf("\nimage de taille : %dx%d\n", image2->width, image2->height);
 

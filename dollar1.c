@@ -117,7 +117,11 @@ Template** loadTemplates()
 		}
 		i++;
 	}
-	templates[i] = NULL;
+	while(i < 500)
+	{
+		templates[i] = NULL;
+		i++;
+	}
 	return templates;
 }
 
@@ -164,7 +168,6 @@ linked_List *resample(linked_List *points, int n)
 
 	for(int i = 1; i < points->count; i++)
 	{
-		
 		Point pi = getIndex(points, i)->point;
 		Point pi1 = getIndex(points, i-1)->point;	
 		double d = distance(pi1, pi);
@@ -342,7 +345,9 @@ int recognize(linked_List* points, Template** templates, double* score)
 		{
 			d += distance(getIndex(points, j)->point, getIndex(templates[i]->points, j)->point);
 		}
-		d = d/points->count;
+		
+		if(points->count)
+			d = d/points->count;
 		
 		//printf("Match with %s : %f percent\n", templates[i]->name, (1 - (d/(0.5*sqrt(SIZE*SIZE + SIZE*SIZE)))) * 100);
 		
@@ -384,24 +389,86 @@ linked_List* format(linked_List* points)
 }
 
 
-void printMatch(linked_List* points, Template** templates)
+void printMatch(linked_List* points, Template** templates, int diffX, int diffY)
 {
+	if(points == NULL)
+	{
+		printf("Empty List.\n");
+		return;
+	}
+	if(!points->count)
+	{
+		printf("Pattern didn't match with any known form.\n");
+		return;
+	}
+	
 	double score;
 	int result = recognize(points, templates, &score);
 	if(result != -1)
-		printf("match with %s with %lf percent\n",templates[result]->name ,score);		// print index recognized
+	{
+		if(!strcmp(templates[result]->name,"line"))
+		{
+			int diffX = points->last->point->x - points->first->point->x;
+			int diffY = points->last->point->y - points->first->point->y;
+			if(fabs((double)diffX) > fabs((double)diffY))
+			{
+				
+				if(diffX > 0)
+					printf("match with right with %lf percent\n",score);
+				else
+					printf("match with left with %lf percent\n",score);
+			}
+			else
+			{
+				if(diffY > 0)
+					printf("match with down with %lf percent\n",score);
+				else
+					printf("match with up with %lf percent\n",score);
+			}
+		}
+		else
+		{
+			printf("match with %s with %lf percent\n",templates[result]->name ,score);		// print index recognized
+		}
+	}
 	else
 		printf("Pattern didn't match with any known form.\n");
 }
 
 
-char* getMatch(linked_List* points, Template** templates)
+char* getMatch(linked_List* points, Template** templates, int diffX, int diffY)
 {
+	if(points == NULL)
+		return "Null list.";
+	if(!points->count)
+		return "Pattern didn't match with any known form.\n";
 	double score;
 	int result = recognize(points, templates, &score);
 	char str[256];
 	if(result != -1)
-		sprintf(str,"match with %s with %lf percent\n",templates[result]->name ,score);		// print index recognized
+	{
+		if(!strcmp(templates[result]->name,"line"))
+		{
+			if(fabs((double)diffX) > fabs((double)diffY))
+			{
+				if(diffX < 0)
+					sprintf(str,"match with right with %lf percent\n",score);
+				else
+					sprintf(str,"match with left with %lf percent\n",score);
+			}
+			else
+			{
+				if(diffY > 0)
+					sprintf(str,"match with down with %lf percent\n",score);
+				else
+					sprintf(str,"match with up with %lf percent\n",score);
+			}
+		}
+		else
+		{
+			sprintf(str,"match with %s with %lf percent\n",templates[result]->name ,score);		// print index recognized
+		}
+	}
 	else
 		sprintf(str,"Pattern didn't match with any known form.\n");
 	

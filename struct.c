@@ -193,6 +193,18 @@ linked_List *emptyList()
 	return list;
 }
 
+void freeList(linked_List* list)
+{
+	Element* curr = list->first;
+	while(curr != NULL)
+	{
+		Element* tmp = curr;
+		curr = curr->next;
+		free(tmp);
+	}
+	free(list);
+}
+
 void addFirst(linked_List *list, Point p)
 {
 	Element *elt = (Element*)malloc(sizeof(Element));
