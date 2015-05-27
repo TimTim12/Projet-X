@@ -397,13 +397,13 @@ void printMatch(linked_List* points, Template** templates, int diffX, int diffY,
 		switch(color)
 		{
 			case 0: 
-				setRecoRed("Empty List.\n");
+				setRecoRed("Empty List.");
 				return;
 			case 1: 
-				setRecoGreen("Empty List.\n");
+				setRecoGreen("Empty List.");
 				return;
 			default: 
-				setRecoBlue("Empty List.\n");
+				setRecoBlue("Empty List.");
 				return;
 		}
 	}
@@ -413,13 +413,13 @@ void printMatch(linked_List* points, Template** templates, int diffX, int diffY,
 		switch(color)
 		{
 			case 0: 
-				setRecoRed("Pattern didn't match with any known form.\n");
+				setRecoRed("Pattern didn't match with any known form.");
 				return;
 			case 1: 
-				setRecoGreen("Pattern didn't match with any known form.\n");
+				setRecoGreen("Pattern didn't match with any known form.");
 				return;
 			default: 
-				setRecoBlue("Pattern didn't match with any known form.\n");
+				setRecoBlue("Pattern didn't match with any known form.");
 				return;
 		}
 	}
@@ -524,13 +524,13 @@ void printMatch(linked_List* points, Template** templates, int diffX, int diffY,
 		switch(color)
 		{
 			case 0: 
-				setRecoRed("Pattern didn't match with any known form.\n");
+				setRecoRed("Pattern didn't match with any known form.");
 				return;
 			case 1: 
-				setRecoRed("Pattern didn't match with any known form.\n");
+				setRecoRed("Pattern didn't match with any known form.");
 				return;
 			default: 
-				setRecoRed("Pattern didn't match with any known form.\n");
+				setRecoRed("Pattern didn't match with any known form.");
 				return;
 		}
 		//printf("Pattern didn't match with any known form.\n");
