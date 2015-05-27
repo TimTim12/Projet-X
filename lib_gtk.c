@@ -60,10 +60,13 @@ GtkWidget* convertOpenCv2Gtk (IplImage* srcImage)
     GtkWidget* gtkImg = NULL;
     GdkPixbuf* gtkPixbuf = NULL;
     IplImage* dstImage = NULL;
-
+		IplImage* lastImage;
+		
     /** Creating the destionation image */
+		lastImage = dstImage;
     dstImage = cvCreateImage( cvSize(srcImage->width,srcImage->height), IPL_DEPTH_8U, 3);
-
+		if (lastImage != NULL)
+			cvReleaseImage(&lastImage);
     /** Converting the format of the picture from BGR to RGB */
     cvCvtColor ( srcImage, dstImage, CV_BGR2RGB );
 
