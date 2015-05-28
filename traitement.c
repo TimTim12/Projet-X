@@ -69,7 +69,7 @@ char* getRecoBlue()
 }
 
 char *get_pattern_reco(){
-    return pattern_reco;
+	return pattern_reco;
 }
 
 
@@ -78,9 +78,9 @@ char *get_pattern_reco(){
 
 void setHSV (int sh, int ss, int sv, int c) {
 
-    h[c] = sh;
-    v[c] = sv;
-    s[c] = ss;
+	h[c] = sh;
+	v[c] = sv;
+	s[c] = ss;
 }
 
 IplImage *image2;
@@ -89,27 +89,27 @@ int xr=0,yr=0,xb=0,yb=0,xv=0,yv=0;
 
 int get_xr() 
 {
-		    return xr;
+	return xr;
 }
 int get_yr() 
 {
-		    return yr;
+	return yr;
 }
 int get_xb() 
 {
-		    return xb;
+	return xb;
 }
 int get_yb() 
 {
-		    return yb;
+	return yb;
 }
 int get_xv() 
 {
-		    return xv;
+	return xv;
 }
 int get_yv() 
 {
-		    return yv;
+	return yv;
 }
 
 
@@ -286,7 +286,7 @@ CvPoint binarisation(IplImage* image, IplImage* hsv, int *nbPixels, int cint)
 	//free tout 
 	cvReleaseStructuringElement(&kernel);
 	cvReleaseImage(&mask);
-	
+
 
 	//si pas d'objet dans la vidéo, point hors champ 
 	if(*nbPixels > 20)
@@ -329,8 +329,8 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels, int 
 	}   
 	if(getmouse())
 		set_coord_mouse(fd, (objectPos[cint].x* 1366)/640, -(objectPos[cint].y* 768)/420);
-        else
-            close(fd);
+	else
+		close(fd);
 	//set_coord_mouse(fd, -objectPos.x* 2, objectPos.y* 2);
 	//Dessine moi un mouton	
 	if (nbPixels > 10)
@@ -351,12 +351,12 @@ void getObjectColor(int event, int x, int y, int flags, void *param)
 		//cvCvtColor(image2, hsv, CV_BGR2HSV);
 		hsv = RGBtoHSV(image2);
 		pixel = cvGet2D(hsv, y, x);
-		
+
 		// Mets à jour la couleur rechercher
 		h[cint] = (int)pixel.val[0];
 		s[cint] = (int)pixel.val[1];
 		v[cint] = (int)pixel.val[2];
-		
+
 		cvReleaseImage(&hsv);
 	}
 
@@ -367,22 +367,22 @@ void getObjectColor(int event, int x, int y, int flags, void *param)
 void *thread_Format_Reco(void* arg)
 {
 	//printMatch(format(redList), templates);
-    //strcpy(pattern_reco,getMatch(format(redList), templates, redList->last->point->x - redList->first->point->x, redList->last->point->y - redList->first->point->y));
-	
+	//strcpy(pattern_reco,getMatch(format(redList), templates, redList->last->point->x - redList->first->point->x, redList->last->point->y - redList->first->point->y));
+
 	printMatch(format(redList), templates, redList->last->point->x - redList->first->point->x, redList->last->point->y - redList->first->point->y,0);
 	printMatch(format(greenList), templates, greenList->last->point->x - greenList->first->point->x, greenList->last->point->y - greenList->first->point->y,1);
 	printMatch(format(blueList), templates, blueList->last->point->x - blueList->first->point->x, blueList->last->point->y - blueList->first->point->y,2);
-	 sprintf(pattern_reco,"R:%s | G:%s | B:%s",getRecoRed(),getRecoGreen(),getRecoBlue()); 
-     
+	sprintf(pattern_reco,"R:%s | G:%s | B:%s",getRecoRed(),getRecoGreen(),getRecoBlue()); 
+
 	update_reco_label();
 	printf("red : %s\ngreen : %s\nblue : %s\n", getRecoRed(), getRecoGreen(), getRecoBlue());
-	
+
 	freeList(redList);
 	freeList(greenList);
 	freeList(blueList);
-	
+
 	(void*) arg;		// avoids warning unused arg
-	
+
 	pthread_exit(NULL);
 }
 
@@ -392,11 +392,11 @@ void *thread_Format_Save(void* arg)
 	printf("Saving pattern...\n");
 	saveTemplate(format(redList), getFigureName(), templates);
 	printf("Pattern succesfully saved !\n");
-	
+
 	freeList(redList);
-	
+
 	(void*) arg;		// avoids warning unused arg
-	
+
 	pthread_exit(NULL);
 }
 
@@ -408,7 +408,7 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 		templatesLoaded = 1;
 		templates = loadTemplates();
 	}
-	
+
 	IplImage *hsv;
 	int nbPixels[3];
 	CvPoint oNPR,oNPG, oNPB ; //objectNextPos
@@ -418,167 +418,150 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 	}else{ 
 		//fait les fenêtre
 
-	//	cvNamedWindow("Color Tracking", CV_WINDOW_AUTOSIZE);
-	//	cvNamedWindow("Mask", CV_WINDOW_AUTOSIZE);
-	//	cvMoveWindow("Color Tracking", 0, 100);
-	//	cvMoveWindow("Mask", 650, 100);
+		//	cvNamedWindow("Color Tracking", CV_WINDOW_AUTOSIZE);
+		//	cvNamedWindow("Mask", CV_WINDOW_AUTOSIZE);
+		//	cvMoveWindow("Color Tracking", 0, 100);
+		//	cvMoveWindow("Mask", 650, 100);
 
 		// clique souris
-	//	cvSetMouseCallback("Color Tracking", getObjectColor);
+		//	cvSetMouseCallback("Color Tracking", getObjectColor);
 		int a = 0;
 		//int fd = connect_mouse("/dev/input/event12");
-	//	while(key != 'q' && key != 'Q') {
-			image2  = cvQueryFrame(capture);
-	/*		if(key == 'r')
+		//	while(key != 'q' && key != 'Q') {
+		image2  = cvQueryFrame(capture);
+		/*		if(key == 'r')
 				cint = 0;
-			if(key == 'g')
+				if(key == 'g')
 				cint = 1;
-			if(key == 'b')
+				if(key == 'b')
 				cint = 2;*/
-			hsv = RGBtoHSV(image2);
-			oNPR = binarisation(image2, hsv, &nbPixels[0], 0);
-			oNPG = binarisation(image2, hsv, &nbPixels[1], 1);
-			oNPB = binarisation(image2, hsv, &nbPixels[2], 2);
-			cvReleaseImage(&hsv);
-			if(getmouse()) 
-			{ fd = connect_mouse("/dev/input/event12"); a = 1;}
-//			else
-	        	addObjectToVideo(image2, oNPR, nbPixels[0], fd, a, 0);
-			addObjectToVideo(image2, oNPG, nbPixels[1], fd, a, 1);
-			addObjectToVideo(image2, oNPB, nbPixels[2], fd, a, 2);
-			//affiche et attend entré clavier pendant 10ms
-	//		key = cvWaitKey(10);
-			
-			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// FIN BOUCLE PRINCIPALE, POINTS MIS A JOUR ICI
-			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			
-			
-			
-			if(key != NULL && (key->keyval == GDK_p || key->keyval == GDK_P))
+		hsv = RGBtoHSV(image2);
+		oNPR = binarisation(image2, hsv, &nbPixels[0], 0);
+		oNPG = binarisation(image2, hsv, &nbPixels[1], 1);
+		oNPB = binarisation(image2, hsv, &nbPixels[2], 2);
+		cvReleaseImage(&hsv);
+		if(getmouse()) 
+		{ fd = connect_mouse("/dev/input/event12"); a = 1;}
+		//			else
+		addObjectToVideo(image2, oNPR, nbPixels[0], fd, a, 0);
+		addObjectToVideo(image2, oNPG, nbPixels[1], fd, a, 1);
+		addObjectToVideo(image2, oNPB, nbPixels[2], fd, a, 2);
+		//affiche et attend entré clavier pendant 10ms
+		//		key = cvWaitKey(10);
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// FIN BOUCLE PRINCIPALE, POINTS MIS A JOUR ICI
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+		if(key != NULL && (key->keyval == GDK_p || key->keyval == GDK_P))
+		{
+			int i = 0;
+			while(templates[i] != NULL)
 			{
-				int i = 0;
-				while(templates[i] != NULL)
-				{
-					printTemplate(templates[i]);
-					printf("\n");
-					i++;
-				}
+				printTemplate(templates[i]);
+				printf("\n");
+				i++;
 			}
-			
-			/*if(key != NULL && (key->keyval == GDK_x || key->keyval == GDK_X))		// switch between learning and reco modes and stops recording.
+		}
+
+		/*if(key != NULL && (key->keyval == GDK_x || key->keyval == GDK_X))		// switch between learning and reco modes and stops recording.
+		  {
+		  setRecording(0);
+		  if(getLearning())
+		  setLearning(0);
+		  else
+		  setLearning(1);
+		  printf("Learning mode is now %s !\n", getLearning() ? "On" : "Off");
+		  }*/
+
+		if(!getLearning())		// reconaissance
+		{
+			if(key != NULL && (key->keyval == GDK_v || key->keyval == GDK_V))
 			{
-				setRecording(0);
-				if(getLearning())
-					setLearning(0);
+				if(!getRecording())		//not recording
+				{
+					setRecording(1);
+					redList = emptyList();
+					blueList = emptyList();
+					greenList = emptyList();
+				}
 				else
-					setLearning(1);
-				printf("Learning mode is now %s !\n", getLearning() ? "On" : "Off");
-			}*/
-			
-			if(!getLearning())		// reconaissance
-			{
-				if(key != NULL && (key->keyval == GDK_v || key->keyval == GDK_V))
 				{
-					if(!getRecording())		//not recording
-					{
-						setRecording(1);
-						redList = emptyList();
-						blueList = emptyList();
-						greenList = emptyList();
-					}
-					else
-					{
-						setRecording(0);
-						//printList(redList);
-						if(recoThread)
-							pthread_join(recoThread, NULL);
-						pthread_create(&recoThread, NULL, thread_Format_Reco, NULL);
-					}
-				}
-				if(getRecording())
-				{
-					if(objectPos[0].x != -1 && objectPos[0].y != -1)
-						addLast(redList, new_point(objectPos[0].x, objectPos[0].y, 0, 0, 0));
-					if(objectPos[1].x != -1 && objectPos[1].y != -1)
-						addLast(greenList, new_point(objectPos[1].x, objectPos[1].y, 0, 0, 0));
-					if(objectPos[2].x != -1 && objectPos[2].y != -1)
-						addLast(blueList, new_point(objectPos[2].x, objectPos[2].y, 0, 0, 0));
+					setRecording(0);
+					//printList(redList);
+					if(recoThread)
+						pthread_join(recoThread, NULL);
+					pthread_create(&recoThread, NULL, thread_Format_Reco, NULL);
 				}
 			}
-			else					// apprentissage
+			if(getRecording())
 			{
-				if(key != NULL && (key->keyval == GDK_v || key->keyval == GDK_V))
+				if(objectPos[0].x != -1 && objectPos[0].y != -1)
+					addLast(redList, new_point(objectPos[0].x, objectPos[0].y, 0, 0, 0));
+				if(objectPos[1].x != -1 && objectPos[1].y != -1)
+					addLast(greenList, new_point(objectPos[1].x, objectPos[1].y, 0, 0, 0));
+				if(objectPos[2].x != -1 && objectPos[2].y != -1)
+					addLast(blueList, new_point(objectPos[2].x, objectPos[2].y, 0, 0, 0));
+			}
+		}
+		else					// apprentissage
+		{
+			if(key != NULL && (key->keyval == GDK_v || key->keyval == GDK_V))
+			{
+				if(!getRecording())
 				{
-					if(!getRecording())
-					{
-						setRecording(1);
-						redList = emptyList();
-					}
-					else
-					{
-						setRecording(0);
-						printList(redList);
-						/*if(formatThread)
-							pthread_join(formatThread, NULL);*/
-						pthread_create(&formatThread, NULL, thread_Format_Save, NULL);
-					}
+					setRecording(1);
+					redList = emptyList();
 				}
-				if(getRecording())
+				else
 				{
-					if(objectPos[getActiveColor()].x != -1 && objectPos[getActiveColor()].y != -1)
-						addLast(redList, new_point(objectPos[getActiveColor()].x, objectPos[getActiveColor()].y, 0, 0, 0));
+					setRecording(0);
+					printList(redList);
+					/*if(formatThread)
+					  pthread_join(formatThread, NULL);*/
+					pthread_create(&formatThread, NULL, thread_Format_Save, NULL);
 				}
-                        }
-     
-      if((!strcmp(recoGreen,"down") && !strcmp(recoBlue,"down")) || (!strcmp(recoRed,"quit") && !strcmp(recoGreen,"quit") && !strcmp(recoBlue,"quit")))
-        {
-            gtk_main_quit();
-            /*char* command[] = {"xdotool", "key", "ctrl+c",NULL};
-            execvp(command[0],command);*/
-        } 
-       else if (!strcmp(recoRed,"chrome")){
-       strcpy(recoRed,"chrome&");           
-       char* command[] = {"gedit",NULL};
-                            pid_t  pid;
-                int    status;
+			}
+			if(getRecording())
+			{
+				if(objectPos[getActiveColor()].x != -1 && objectPos[getActiveColor()].y != -1)
+					addLast(redList, new_point(objectPos[getActiveColor()].x, objectPos[getActiveColor()].y, 0, 0, 0));
+			}
+		}
 
-                if ((pid = fork()) < 0) {     /* fork a child process           */
-                        printf("*** ERROR: forking child process failed\n");
-                        exit(1);
-                }
-                else if (pid == 0) {          /* for the child process:         */
-              execvp(command[0],command);
-           
- exit(1);
-          
-     }
-     else {                                  /* for the parent:      */
-          while (wait(&status) != pid)       /* wait for completion  */
-               ;
-     }
-       }
-           //Lancement chrome
-		//close(fd);
-		//free tout
-//		printf("\nimage de taille : %dx%d\n", image2->width, image2->height);
+		if((!strcmp(recoGreen,"down") && !strcmp(recoBlue,"down")) || (!strcmp(recoRed,"quit") && !strcmp(recoGreen,"quit") && !strcmp(recoBlue,"quit")))
+		{
+			gtk_main_quit();
+		} 
+		else if (!strcmp(recoRed,"gedit"))
+		{
+			strcpy(recoRed,"gedit&");           
+			char* command[] = {"gedit",NULL};
+			pid_t  pid;
+			int    status;
 
-	//	cvDestroyAllWindows();
-	//	cvDestroyWindow("Color Tracking");
-	//	cvDestroyWindow("Mask");
-	//	cvReleaseCapture(&capture);
-    //		printf("Merci d'avoir utilisé notre logiciel de capture d'image.\n");
+			if ((pid = fork()) < 0) {     /* fork a child process           */
+				printf("*** ERROR: forking child process failed\n");
+				exit(1);
+			}
+			else if (pid == 0) {          /* for the child process:         */
+				execvp(command[0],command);
+				exit(1);
+			}
+		}
 	}
 	return image2;
-}
+	}
 
 
-/*void for_gtk(IplImage *image){
-	int nbPixels;
+	/*void for_gtk(IplImage *image){
+	  int nbPixels;
 	//Point p;
 	//p = new_point(0,0,0,0,0);
 	CvPoint objectNextPos;
 	cvSetMouseCallback("Color Tracking", getObjectColor);
 	objectNextPos = binarisation(image, &nbPixels);
 	addObjectToVideo(image, objectNextPos, nbPixels);
-}*/
+	}*/

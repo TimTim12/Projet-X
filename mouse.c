@@ -11,7 +11,7 @@ int posX;
 int connect_mouse(char * file){
    int fd = open(file, O_RDWR);
    if(fd<1){
-        printf("Error: Please check your input");
+        printf("Error: Please check your input\n");
         return -1;
     }
    posX = 0;
