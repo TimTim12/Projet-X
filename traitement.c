@@ -441,7 +441,7 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 		oNPB = binarisation(image2, hsv, &nbPixels[2], 2);
 		cvReleaseImage(&hsv);
 		if(getmouse()) 
-		{ fd = connect_mouse("/dev/input/event12"); a = 1;}
+		{ fd = connect_mouse("/dev/input/event3"); a = 1;}
 		//			else
 		addObjectToVideo(image2, oNPR, nbPixels[0], fd, a, 0);
 		addObjectToVideo(image2, oNPG, nbPixels[1], fd, a, 1);
