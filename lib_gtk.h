@@ -5,6 +5,7 @@
 #include <gtk/gtk.h>
 #include "struct.h"
 
+int getmouse();
 char* getFigureName();
 int getActiveColor();
 void setFigureName(char* name);

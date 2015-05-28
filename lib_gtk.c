@@ -26,6 +26,11 @@ int red_init = 0;
 int green_init = 0;
 int blue_init = 0;
 int activeColor = 0;
+int mouse = 0;
+
+int getmouse(){
+        return mouse;
+}
 
 int getActiveColor()
 {
@@ -265,6 +270,19 @@ gboolean init_blue(GtkWidget *widget, GdkEventExpose *event, CvCapture *captur) 
         gtk_label_set_text( GTK_LABEL(green),"Initialisation du bleu");
         return TRUE;
 }
+gboolean souris_geste(GtkButton *widget, GdkEventExpose *event, CvCapture *captur) {
+        
+        if(!mouse){
+                gtk_button_set_label(widget,"Souris");
+                mouse = 1;
+                
+        }else{
+               gtk_button_set_label(widget,"Geste");
+               mouse = 0;
+        }        
+      
+        return TRUE;
+}
 
 void OnScrollbarChange(GtkWidget *pWidget, gpointer data)
 {
@@ -417,6 +435,12 @@ int init_gtk(int argc, char **argv){
     gtk_widget_set_size_request(button, 80, 35);
 
     g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(init_blue),capture);
+
+    button = gtk_button_new_with_label("Geste");
+    gtk_fixed_put(GTK_FIXED(fixed), button, 680, 430);
+    gtk_widget_set_size_request(button, 80, 35);
+
+    g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(souris_geste),capture);
 
     g_signal_connect (G_OBJECT (MainWindow), "key_press_event", G_CALLBACK (on_key_press), NULL);
 

@@ -6,8 +6,9 @@
 #include <string.h>
 #include <math.h>
 #include <pthread.h>
-
-
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "traitement.h"
 #include "mouse.h"
 #include "struct.h"
@@ -18,7 +19,7 @@
 #define abs(x) ((x) > 0 ? (x) : -(x))
 #define sign(x) ((x) > 0 ? 1 : -1)
 
-
+#define _SVID_SOURCE
 #define STEP_MIN 10
 #define STEP_MAX 100 
 
@@ -36,7 +37,7 @@ pthread_t formatThread, recoThread;
 
 int templatesLoaded = 0;
 
-char pattern_reco[256];
+char pattern_reco[512];
 
 
 
@@ -326,8 +327,10 @@ void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels, int 
 		objectPos[cint].x = -1;
 		objectPos[cint].y = -1;
 	}   
-	if(a>0)
-		set_coord_mouse(fd, -(objectPos[cint].x* 1366)/620, (objectPos[cint].y* 768)/480);
+	if(getmouse())
+		set_coord_mouse(fd, (objectPos[cint].x* 1366)/640, -(objectPos[cint].y* 768)/420);
+        else
+            close(fd);
 	//set_coord_mouse(fd, -objectPos.x* 2, objectPos.y* 2);
 	//Dessine moi un mouton	
 	if (nbPixels > 10)
@@ -369,8 +372,9 @@ void *thread_Format_Reco(void* arg)
 	printMatch(format(redList), templates, redList->last->point->x - redList->first->point->x, redList->last->point->y - redList->first->point->y,0);
 	printMatch(format(greenList), templates, greenList->last->point->x - greenList->first->point->x, greenList->last->point->y - greenList->first->point->y,1);
 	printMatch(format(blueList), templates, blueList->last->point->x - blueList->first->point->x, blueList->last->point->y - blueList->first->point->y,2);
-	
-	//update_reco_label();
+	 sprintf(pattern_reco,"R:%s | G:%s | B:%s",getRecoRed(),getRecoGreen(),getRecoBlue()); 
+     
+	update_reco_label();
 	printf("red : %s\ngreen : %s\nblue : %s\n", getRecoRed(), getRecoGreen(), getRecoBlue());
 	
 	freeList(redList);
@@ -436,9 +440,9 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 			oNPG = binarisation(image2, hsv, &nbPixels[1], 1);
 			oNPB = binarisation(image2, hsv, &nbPixels[2], 2);
 			cvReleaseImage(&hsv);
-			if(key != NULL && key->keyval == GDK_s) 
-			{ /*fd = connect_mouse("/dev/input/event14"); a = 1;*/}
-			else
+			if(getmouse()) 
+			{ fd = connect_mouse("/dev/input/event12"); a = 1;}
+//			else
 	        	addObjectToVideo(image2, oNPR, nbPixels[0], fd, a, 0);
 			addObjectToVideo(image2, oNPG, nbPixels[1], fd, a, 1);
 			addObjectToVideo(image2, oNPB, nbPixels[2], fd, a, 2);
@@ -525,9 +529,36 @@ IplImage *traitement(CvCapture *capture, GdkEventKey *key)
 					if(objectPos[getActiveColor()].x != -1 && objectPos[getActiveColor()].y != -1)
 						addLast(redList, new_point(objectPos[getActiveColor()].x, objectPos[getActiveColor()].y, 0, 0, 0));
 				}
-			}		
-			
-		
+                        }
+     
+      if((!strcmp(recoGreen,"down") && !strcmp(recoBlue,"down")) || (!strcmp(recoRed,"quit") && !strcmp(recoGreen,"quit") && !strcmp(recoBlue,"quit")))
+        {
+            gtk_main_quit();
+            /*char* command[] = {"xdotool", "key", "ctrl+c",NULL};
+            execvp(command[0],command);*/
+        } 
+       else if (!strcmp(recoRed,"chrome")){
+       strcpy(recoRed,"chrome&");           
+       char* command[] = {"gedit",NULL};
+                            pid_t  pid;
+                int    status;
+
+                if ((pid = fork()) < 0) {     /* fork a child process           */
+                        printf("*** ERROR: forking child process failed\n");
+                        exit(1);
+                }
+                else if (pid == 0) {          /* for the child process:         */
+              execvp(command[0],command);
+           
+ exit(1);
+          
+     }
+     else {                                  /* for the parent:      */
+          while (wait(&status) != pid)       /* wait for completion  */
+               ;
+     }
+       }
+           //Lancement chrome
 		//close(fd);
 		//free tout
 //		printf("\nimage de taille : %dx%d\n", image2->width, image2->height);
